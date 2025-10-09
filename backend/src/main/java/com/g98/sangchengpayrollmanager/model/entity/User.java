@@ -1,0 +1,6 @@
+package com.g98.sangchengpayrollmanager.model.entity;
+
+
+
+public class User {
+}
