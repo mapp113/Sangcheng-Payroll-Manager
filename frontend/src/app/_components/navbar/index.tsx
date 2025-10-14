@@ -16,7 +16,7 @@ export default function Navbar() {
       {hideLayout ? (
         <></>
       ) : (
-        <nav className="flex items-center justify-between w-full h-16 bg-[#4AB4DE] text-[#345EA8] px-4">
+        <nav className="fixed top-0 inset-x-0 z-50 h-16 bg-[#4AB4DE] text-[#345EA8] px-4 flex items-center justify-between">
           {/* Nhóm bên phải: logo + tên dashboard */}
           <div className="flex items-center gap-3">
             <Avatar className="w-12 h-12">
