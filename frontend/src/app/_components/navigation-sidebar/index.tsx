@@ -19,8 +19,8 @@ export default function NavigationSidebar() {
             <Image src="/icons/contract.png" alt="Contact" width={52} height={52} />
           </a>
         </li>
-        <li>
-          <a href="/payroll" className="hover:underline">
+        <li className="rounded-xl bg-[#4AB4DE]">
+          <a href="/payroll" className="hover:underline ">
             <Image src="/icons/payroll.png" alt="Payroll" width={52} height={52} />
           </a>
         </li>
