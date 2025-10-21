@@ -6,9 +6,8 @@ import Pagination from "./pagination";
 export default function PayrollPage() {
   
   return (
-    <div>
-      {/* TODO: Làm khung tròn */}
-      <h1>Employee Payroll</h1>
+    <div className="h-full w-full border border-black rounded-md mt-7 p-2">
+      <h1 className="text-2xl font-semibold">Employees Payroll</h1>
       <TableHeader />
       <TableBody />
       <Pagination />
