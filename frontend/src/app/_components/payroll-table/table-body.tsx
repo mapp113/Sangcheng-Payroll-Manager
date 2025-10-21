@@ -1,10 +1,11 @@
+import PayrollItem, { PayrollRow } from "./table-item";
 
-
-export default function TableBody() {
-  
+export default function PayrollBody({ rows }: { rows: PayrollRow[] }) {
   return (
-    <div>
-      {/* TODO: Fetch and iterate data */}
-    </div>
+    <tbody className="">
+      {rows.map((r) => (
+        <PayrollItem key={r.id} row={r} />
+      ))}
+    </tbody>
   );
 }
