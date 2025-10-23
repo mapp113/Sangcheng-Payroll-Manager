@@ -20,33 +20,33 @@ const sample: PayrollRow[] = [
   { id: "SC-200", name: "Do Van B",     position: "Accounting", salary: 1000, status: "red"    },
 ];
 
+export async function fetchPayrollData(signal?: AbortSignal): Promise<PayrollRow[]> {
+  try {
+    const res = await fetch("/api/payroll", { signal, cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    return (json?.data ?? []) as PayrollRow[];
+  } catch {
+    return USE_SAMPLE_ON_ERROR ? sample : [];
+  }
+}
+
 export default function PayrollPage() {
   const [rows, setRows] = useState<PayrollRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
 
-  // Fetch chỉ ở đây
   useEffect(() => {
     const ac = new AbortController();
     (async () => {
-      try {
-        setLoading(true);
-        // Thay endpoint theo API thật của bạn
-        const res = await fetch("/api/payroll", { signal: ac.signal, cache: "no-store" });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
-        const data = (json?.data ?? []) as PayrollRow[];
-        setRows(data);
-      } catch {
-        setRows(USE_SAMPLE_ON_ERROR ? sample : []);
-      } finally {
-        setLoading(false);
-      }
+      setLoading(true);
+      const data = await fetchPayrollData(ac.signal);
+      setRows(data);
+      setLoading(false);
     })();
     return () => ac.abort();
   }, []);
 
-  // Giới hạn trang hợp lệ khi dữ liệu đổi
   const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);
