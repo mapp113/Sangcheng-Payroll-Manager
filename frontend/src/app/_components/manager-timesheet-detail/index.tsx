@@ -1,7 +1,8 @@
+"use client";
+
 import {
     DetailHeader,
     type DetailHeaderLine,
-    //  DetailSectionCard,
     DetailShell,
     DetailSummaryCard,
 } from "@/app/_components/detail";
@@ -12,6 +13,7 @@ import type {
     TimesheetOtherEntry,
 } from "./types";
 import {formatDecimal, formatHours, formatTime} from "./utils";
+import {useMemo, useState} from "react";
 
 interface ManagerTimesheetDetailProps {
     detail: ManagerTimesheetDetailData;
@@ -22,25 +24,24 @@ export default function ManagerTimesheetDetail({
                                                    detail,
                                                    view = "timesheet",
                                                }: ManagerTimesheetDetailProps) {
-    const headerLines: DetailHeaderLine[] = [];
+    // ✅ giữ state ngày, khởi tạo từ data
+    const [startDate, setStartDate] = useState(detail.startDate);
+    const [endDate, setEndDate] = useState(detail.endDate);
 
+    const headerLines: DetailHeaderLine[] = [];
     if (detail.employee.employeeId) {
         headerLines.push({text: detail.employee.employeeId, variant: "accent"});
     }
 
-    if (detail.periodLabel) {
-        headerLines.push({text: detail.periodLabel, variant: "muted"});
-    }
+    // ✅ hiển thị nhãn từ state ngày
+    const periodLabel = useMemo(() => `${startDate} - ${endDate}`, [startDate, endDate]);
+    headerLines.push({text: periodLabel, variant: "muted"});
 
     const header = (
         <DetailHeader
             badgeLabel={detail.title}
             title={detail.employee.name}
-            subtitle={
-                [detail.employee.position, detail.employee.department]
-                    .filter(Boolean)
-                    .join(" • ")
-            }
+            subtitle={[detail.employee.position, detail.employee.department].filter(Boolean).join(" • ")}
             lines={headerLines}
             avatarName={detail.employee.name}
             avatarUrl={detail.employee.avatarUrl}
@@ -62,9 +63,15 @@ export default function ManagerTimesheetDetail({
         return (
             <DetailShell>
                 {header}
-
                 <div className="space-y-6 p-6">
-                    <OtherPeriodCard periodLabel={detail.periodLabel}/>
+                    <OtherPeriodCard
+                        startDate={startDate}
+                        endDate={endDate}
+                        onChange={(s, e) => {
+                            setStartDate(s);
+                            setEndDate(e);
+                        }}
+                    />
                     <OtherEntriesTable entries={detail.otherEntries}/>
                 </div>
             </DetailShell>
@@ -77,18 +84,15 @@ export default function ManagerTimesheetDetail({
 
             <div className="grid gap-6 p-6 xl:grid-cols-[320px_1fr]">
                 <div className="space-y-6">
-                    {/*<DetailSectionCard title="General Information" iconSrc="/icons/employee.png">*/}
-                    {/*    <dl className="grid gap-y-4">*/}
-                    {/*        {detail.generalInformation.map((item) => (*/}
-                    {/*            <div key={item.label} className="grid gap-1">*/}
-                    {/*                <dt className="text-xs font-semibold uppercase tracking-[0.3em] text-[#56749A]">{item.label}</dt>*/}
-                    {/*                <dd className="text-sm font-semibold text-[#1D3E6A]">{item.value}</dd>*/}
-                    {/*            </div>*/}
-                    {/*        ))}*/}
-                    {/*    </dl>*/}
-                    {/*</DetailSectionCard>*/}
-
-                    <LeaveSummaryCard periodLabel={detail.periodLabel} leaveSummary={detail.leaveSummary}/>
+                    <LeaveSummaryCard
+                        startDate={startDate}
+                        endDate={endDate}
+                        onChange={(s, e) => {
+                            setStartDate(s);
+                            setEndDate(e);
+                        }}
+                        leaveSummary={detail.leaveSummary}
+                    />
                 </div>
 
                 <div className="space-y-6">
@@ -99,18 +103,49 @@ export default function ManagerTimesheetDetail({
     );
 }
 
+/* ===== Cards & Tables ===== */
+
 function LeaveSummaryCard({
-                              periodLabel,
+                              startDate,
+                              endDate,
+                              onChange,
                               leaveSummary,
                           }: {
-    periodLabel: string;
+    startDate: string;
+    endDate: string;
+    onChange: (s: string, e: string) => void;
     leaveSummary: ManagerTimesheetDetailData["leaveSummary"];
 }) {
     return (
         <div
             className="rounded-2xl border border-dashed border-[#4AB4DE] bg-[#F4FBFF] p-5 text-[#1D3E6A] shadow-[6px_6px_0_#CCE1F0]">
-            <div className="text-xs font-semibold uppercase tracking-[0.35em] text-[#56749A]">Time period</div>
-            <div className="mt-2 text-lg font-semibold text-[#1D3E6A]">{periodLabel}</div>
+            <div className="text-xs font-semibold uppercase tracking-[0.3em] text-[#1D3E6A]">
+                TIME PERIOD
+            </div>
+
+            {/* ✅ 2 ô chọn ngày */}
+            <div className="mt-2 flex flex-col gap-3">
+                <div className="flex flex-col">
+                    <label className="text-xs font-semibold text-[#56749A] mb-1">Start Date</label>
+                    <input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => onChange(e.target.value, endDate)}
+                        className="rounded-xl border border-[#CCE1F0] bg-white px-3 py-2 text-sm text-[#1D3E6A] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4AB4DE]"
+                    />
+                </div>
+
+                <div className="flex flex-col">
+                    <label className="text-xs font-semibold text-[#56749A] mb-1">End Date</label>
+                    <input
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => onChange(startDate, e.target.value)}
+                        className="rounded-xl border border-[#CCE1F0] bg-white px-3 py-2 text-sm text-[#1D3E6A] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4AB4DE]"
+                    />
+                </div>
+            </div>
+
             <div className="mt-4 flex flex-wrap gap-3">
                 <button
                     type="button"
@@ -138,7 +173,7 @@ function LeaveSummaryCard({
 function TimesheetTable({entries}: { entries: TimesheetEntry[] }) {
     return (
         <section
-            className="overflow-hidden rounded-2xl border border-black bg-white text-[#1D3E6A] shadow-[6px_6px_0_#CCE1F0]">
+            className="overflow-hidden rounded-2xl border border-black bg.white text-[#1D3E6A] shadow-[6px_6px_0_#CCE1F0]">
             <table className="w-full border-collapse">
                 <thead className="bg-[#CCE1F0] text-xs font-semibold uppercase tracking-[0.3em] text-[#1D3E6A]">
                 <tr>
@@ -160,20 +195,42 @@ function TimesheetTable({entries}: { entries: TimesheetEntry[] }) {
     );
 }
 
-function OtherPeriodCard({periodLabel}: { periodLabel: string }) {
+function OtherPeriodCard({
+                             startDate,
+                             endDate,
+                             onChange,
+                         }: {
+    startDate: string;
+    endDate: string;
+    onChange: (s: string, e: string) => void;
+}) {
     return (
         <div
             className="rounded-2xl border border-dashed border-[#4AB4DE] bg-[#F4FBFF] p-5 text-[#1D3E6A] shadow-[6px_6px_0_#CCE1F0]">
-            <div className="text-xs font-semibold uppercase tracking-[0.35em] text-[#56749A]">Time period</div>
-            <div className="mt-2 text-lg font-semibold text-[#1D3E6A]">{periodLabel}</div>
+            <div className="text-xs font-semibold uppercase tracking-[0.35em] text-[#56749A]">
+                Time period
+            </div>
+            <div className="mt-2 flex items-center gap-2">
+                <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => onChange(e.target.value, endDate)}
+                    className="border rounded px-2 py-1 text-sm"
+                />
+                <span className="text-[#56749A]">-</span>
+                <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => onChange(startDate, e.target.value)}
+                    className="border rounded px-2 py-1 text-sm"
+                />
+            </div>
         </div>
     );
 }
 
 function OtherEntriesTable({entries}: { entries?: TimesheetOtherEntry[] }) {
-    if (!entries?.length) {
-        return null;
-    }
+    if (!entries?.length) return null;
 
     return (
         <section
@@ -189,8 +246,10 @@ function OtherEntriesTable({entries}: { entries?: TimesheetOtherEntry[] }) {
                 </thead>
                 <tbody>
                 {entries.map((entry) => (
-                    <tr key={`${entry.type}-${entry.description}-${entry.startedOn}`}
-                        className="border-b border-[#E6F2FB] last:border-0">
+                    <tr
+                        key={`${entry.type}-${entry.description}-${entry.startedOn}`}
+                        className="border-b border-[#E6F2FB] last:border-0"
+                    >
                         <td className="px-5 py-4 text-sm font-semibold text-[#1D3E6A]">{entry.type}</td>
                         <td className="px-5 py-4 text-sm font-semibold text-[#1D3E6A]">{entry.description}</td>
                         <td className="px-5 py-4 text-sm font-semibold text-[#1D3E6A]">{entry.amount}</td>
@@ -244,3 +303,18 @@ function TimesheetTableRow({entry}: { entry: TimesheetEntry }) {
         </tr>
     );
 }
+
+/* ===== utils.ts giữ nguyên ===== */
+// export function formatDecimal(value: number, fractionDigits = 2) {
+//     return value.toFixed(fractionDigits);
+// }
+//
+// export function formatTime(value?: number | null) {
+//     if (value === null || typeof value === "undefined") return "--";
+//     return formatDecimal(value);
+// }
+//
+// export function formatHours(value?: number | null, {fallback = "N/A"} = {}) {
+//     if (value === null || typeof value === "undefined") return fallback;
+//     return `${formatDecimal(value)}hrs`;
+// }

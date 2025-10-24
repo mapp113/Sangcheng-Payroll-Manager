@@ -44,7 +44,9 @@ export interface ManagerTimesheetDetailData {
     dashboardTitle: string;
     title: string;
     tabs: TimesheetToolbarTab[];
-    periodLabel: string;
+    // ✅ thay periodLabel bằng 2 field dưới
+    startDate: string; // ISO: "YYYY-MM-DD"
+    endDate: string;   // ISO: "YYYY-MM-DD"
     employee: {
         name: string;
         position: string;
