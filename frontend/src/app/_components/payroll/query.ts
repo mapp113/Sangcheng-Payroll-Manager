@@ -40,5 +40,5 @@ export async function PayrollQuery(param: PayrollParam) : Promise<{content: Payr
   const requestUrl = `${API_URL}?${queryParams.toString()}`;
   const response = await fetch(requestUrl);
   const data = await response.json();
-  return { content: data.content, size: data.size };
+  return { content: data.content, size: data.totalPages };
 }

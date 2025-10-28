@@ -1,8 +1,27 @@
-import { timesheetQuery } from "@/app/_components/manager/timesheet/timesheet-param";
+import { useContext } from "react";
+import { DataContext, ParamsContext } from "../timesheet-context";
+import { TimesheetQuery } from "../query";
 
-
-
-export default function TimesheetToolbar({ param }: { param: timesheetQuery }) {
+export default function TimesheetToolbar() {
+  const param = useContext(ParamsContext)!;
+  const data = useContext(DataContext)!;
+  const dateChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    param.setTimesheetParams({
+      ...param.timesheetParams,
+      date: e.target.value,
+    });
+    const newDate = {
+      ...param.timesheetParams,
+      keyword: (e.target as HTMLInputElement).value,
+    };
+    TimesheetQuery(newDate).then((dataResponse) => {
+      data.setTimesheetData(dataResponse.content);
+      param.setTimesheetParams((prev) => ({
+        ...prev,
+        totalPages: dataResponse.size.toString(),
+      }));
+    });
+  }
 
   return (
     <div className="flex p-3 box-border">
@@ -14,8 +33,7 @@ export default function TimesheetToolbar({ param }: { param: timesheetQuery }) {
           <input
             className="focus:outline-0"
             type="month"
-            onChange={(e) => param.date[1](e.target.value)}
-            value={new Date().toISOString().slice(0, 7)}
+            onChange={dateChangeHandler}
           />
         </div>
       </div>

@@ -25,12 +25,14 @@ export default function Pagination() {
   const switchPageHandler = (direction: "next" | "prev") => {
     const currentPage = parseInt(payrollParams.payrollParams.page, 10);
     let newPage = currentPage;
-    if (direction === "next" && currentPage < parseInt(payrollParams.payrollParams.totalPage, 10)) {
+    if (direction === "next" && currentPage < parseInt(payrollParams.payrollParams.totalPage, 10)-1) {
       newPage += 1;
+      setPageHandler(newPage.toString());
     } else if (direction === "prev" && currentPage > 0) {
       newPage -= 1;
+      setPageHandler(newPage.toString());
     }
-    setPageHandler(newPage.toString());
+    
   };
 
   return (
@@ -38,7 +40,7 @@ export default function Pagination() {
       <div className="flex space-x-2">
         <button className="cursor-pointer" onClick={() => setPageHandler("0")}><ChevronsLeft /></button>
         <button className="cursor-pointer" onClick={() => switchPageHandler("prev")}><ChevronLeft /></button>
-        <span>Page {parseInt(payrollParams.payrollParams.page, 10) + 1} of {parseInt(payrollParams.payrollParams.totalPage, 10) + 1}</span>
+        <span>Page {parseInt(payrollParams.payrollParams.page, 10) + 1} of {parseInt(payrollParams.payrollParams.totalPage, 10)}</span>
         <button className="cursor-pointer" onClick={() => switchPageHandler("next")}><ChevronRight /></button>
         <button className="cursor-pointer" onClick={() => setPageHandler(payrollParams.payrollParams.totalPage.toString())}><ChevronsRight /></button>
       </div>

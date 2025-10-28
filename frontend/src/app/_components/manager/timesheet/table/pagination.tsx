@@ -1,45 +1,49 @@
-interface PaginationProps {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-}
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { DataContext, ParamsContext } from "../timesheet-context";
+import { useContext } from "react";
+import { TimesheetQuery } from "../query";
+export default function Pagination() {
+  const params = useContext(ParamsContext)!;
+  const data = useContext(DataContext)!;
 
-export default function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
+  const setPageHandler = async (newPage: string) => {
+    params.setTimesheetParams({
+      ...params.timesheetParams,
+      index: newPage,
+    });
+    const newParams = {
+      ...params.timesheetParams,
+      index: newPage,
+    };
+    TimesheetQuery(newParams).then((dataResponse) => {
+      data.setTimesheetData(dataResponse.content);
+      params.setTimesheetParams((prev) => ({
+        ...prev,
+        totalPages: dataResponse.size.toString(),
+      }));
+    });
+  };
+  const switchPageHandler = (direction: "next" | "prev") => {
+    const currentPage = parseInt(params.timesheetParams.index, 10);
+    let newPage = currentPage;
+    if (direction === "next" && currentPage < parseInt(params.timesheetParams.totalPages, 10)-1) {
+      newPage += 1;
+      setPageHandler(newPage.toString());
+    } else if (direction === "prev" && currentPage > 0) {
+      newPage -= 1;
+      setPageHandler(newPage.toString());
+    }
+  };
+
   return (
-    <div className="flex items-center justify-end gap-1 p-2">
-      <button
-        className="px-1 text-gray-600 disabled:text-gray-300 hover:text-blue-600"
-        onClick={() => onPageChange(1)}
-        disabled={currentPage <= 1}
-      >
-        &lt;&lt;
-      </button>
-      <button
-        className="px-1 text-gray-600 disabled:text-gray-300 hover:text-blue-600"
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage <= 1}
-      >
-        &lt;
-      </button>
-      
-      <span className="px-2 text-blue-600 font-medium">
-        {currentPage}
-      </span>
-
-      <button
-        className="px-1 text-gray-600 disabled:text-gray-300 hover:text-blue-600"
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage >= totalPages}
-      >
-        &gt;
-      </button>
-      <button
-        className="px-1 text-gray-600 disabled:text-gray-300 hover:text-blue-600"
-        onClick={() => onPageChange(totalPages)}
-        disabled={currentPage >= totalPages}
-      >
-        &gt;&gt;
-      </button>
+    <div className="flex justify-end items-center py-4">
+      <div className="flex space-x-2">
+        <button className="cursor-pointer" onClick={() => setPageHandler("0")}><ChevronsLeft /></button>
+        <button className="cursor-pointer" onClick={() => switchPageHandler("prev")}><ChevronLeft /></button>
+        <span>Page {parseInt(params.timesheetParams.index, 10) + 1} of {parseInt(params.timesheetParams.totalPages, 10)}</span>
+        <button className="cursor-pointer" onClick={() => switchPageHandler("next")}><ChevronRight /></button>
+        <button className="cursor-pointer" onClick={() => setPageHandler(params.timesheetParams.totalPages.toString())}><ChevronsRight /></button>
+      </div>
     </div>
   );
 }

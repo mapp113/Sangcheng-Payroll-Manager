@@ -1,11 +1,16 @@
 import { Search } from "lucide-react";
-import { timesheetQuery } from "../timesheet-param";
+import { useContext } from "react";
+import { DataContext, ParamsContext } from "../timesheet-context";
+import { TimesheetQuery } from "../query";
 
 const backButtonHandler = () => {
   alert("Back")
 }
 
-export default function TimesheetToolbar({ param, onReload }: { param: timesheetQuery; onReload: () => void }) {
+export default function TimesheetToolbar() {
+  const params = useContext(ParamsContext)!;
+  const data = useContext(DataContext)!;
+
   return (
     <div className="flex items-end border-b border-black p-2">
       <button
@@ -21,24 +26,38 @@ export default function TimesheetToolbar({ param, onReload }: { param: timesheet
           id="payroll-toolbar-search-input"
           className="inline focus:outline-0"
           placeholder="Search"
-          defaultValue={param.keyword[0]}
+          defaultValue={params?.timesheetParams.keyword}
           onKeyDown={(e) => {
             if ((e as React.KeyboardEvent<HTMLInputElement>).key === "Enter") {
-              param.keyword[1]((e.target as HTMLInputElement).value);
-              param.index[1]("1");
-              onReload();
+              params.setTimesheetParams((prev) => ({
+                ...prev,
+                keyword: (e.target as HTMLInputElement).value,
+                index: "0",
+              }));
+              const newParams = {
+                ...params.timesheetParams,
+                keyword: (e.target as HTMLInputElement).value,
+              };
+
+              TimesheetQuery(newParams).then((dataResponse) => {
+                data.setTimesheetData(dataResponse.content);
+                params.setTimesheetParams((prev) => ({
+                  ...prev,
+                  totalPages: dataResponse.size.toString(),
+                }));
+              });
             }
           }}
         />
       </div>
       <div className="flex items-center gap-2 ml-auto">
         <button
-        id="payroll-toolbar-back-button"
-        className="mr-15 py-3 px-10 border rounded-sm text-xs border-black bg-[#9ee87b] text-[#5a896b] hover:bg-[#91d771] transition-all cursor-pointer"
-        onClick={backButtonHandler}
-      >
-        APPROVE
-      </button>
+          id="payroll-toolbar-back-button"
+          className="mr-15 py-3 px-10 border rounded-sm text-xs border-black bg-[#9ee87b] text-[#5a896b] hover:bg-[#91d771] transition-all cursor-pointer"
+          onClick={backButtonHandler}
+        >
+          APPROVE
+        </button>
       </div>
     </div>
   );

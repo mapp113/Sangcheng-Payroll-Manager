@@ -1,76 +1,24 @@
-import { useEffect, useState } from "react";
-import { timesheetQuery } from "../timesheet-param";
-import TimesheetTableItem from "./table-item";
-import type { TimesheetRow } from "../timesheet-param";
+import { useContext, useEffect, useState } from "react";
+import { DataContext, ParamsContext } from "../timesheet-context";
+import { TimesheetQuery } from "../query";
 
-const API_URL = "http://your-api-url/timesheets";
-const USE_SAMPLE_DATA = true;
-
-const SAMPLE_DATA: TimesheetRow[] = [
-  {
-    id: "1",
-    name: "Nguyen Van A",
-    position: "Developer",
-    hoursWorked: { totalTime: 160, overTime: 20 },
-    timeOff: "2",
-    note: "Sick leave",
-  },
-  {
-    id: "2",
-    name: "Tran Thi B",
-    position: "Designer",
-    hoursWorked: { totalTime: 160, overTime: 20 },
-    timeOff: "0",
-    note: "",
-  },
-];
-
-async function fetchData(param: timesheetQuery): Promise<TimesheetRow[]> {
-  if (USE_SAMPLE_DATA) {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return SAMPLE_DATA;
-  }
-
-  // Build query string from non-empty params
-  const queryParams = new URLSearchParams();
-  if (param.keyword[0]) queryParams.set('keyword', param.keyword[0]);
-  if (param.date[0]) queryParams.set('date', param.date[0]);
-  if (param.index[0]) queryParams.set('page', param.index[0]);
-
-  const queryString = queryParams.toString();
-  const url = queryString ? `${API_URL}?${queryString}` : API_URL;
-  console.log('Fetching data from URL:', url);
-
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    return [];
-  }
-}
-
-export default function TimesheetTableBody({
-  param,
-  reloadFlag,
-}: {
-  param: timesheetQuery;
-  reloadFlag: number;
-}) {
-  const [rows, setRows] = useState<TimesheetRow[]>([]);
+export default function TimesheetTableBody() {
+  const params = useContext(ParamsContext)!;
+  const data = useContext(DataContext)!;
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
-    fetchData(param)
-      .then(setRows)
-      .finally(() => setLoading(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [param.keyword[0], param.date[0], param.index[0], reloadFlag]);
+    TimesheetQuery(params.timesheetParams).then((dataResponse) => {
+      data.setTimesheetData(dataResponse.content);
+      params.setTimesheetParams((prev) => ({
+        ...prev,
+        totalPages: dataResponse.size.toString(),
+      }));
+      setLoading(false);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (loading) {
     return (
@@ -84,7 +32,7 @@ export default function TimesheetTableBody({
     );
   }
 
-  if (!rows.length) {
+  if (!data.timesheetData.length) {
     return (
       <tbody>
         <tr>
@@ -98,8 +46,17 @@ export default function TimesheetTableBody({
 
   return (
     <tbody>
-      {rows.map((row) => (
-        <TimesheetTableItem key={row.id} row={row} />
+      {data.timesheetData.map((record) => (
+        <tr key={record.employeeCode} className="hover:bg-gray-50">
+          <td className="py-3 px-4">{record.employeeCode}</td>
+          <td className="py-3 px-4">{record.fullName}</td>
+          <td className="py-3 px-4">{record.positionName}</td>
+          <td className="py-3 px-4"><div>{`Total time: ${record.daysHours}h`}</div><div>{`OT: ${record.otHours}h`}</div></td>
+          <td className="py-3 px-4">{record.timeOff}</td>
+          <td className="py-3 px-4">
+            <button className="px-2 py-1 rounded-xl bg-[#79dee9] cursor-pointer">Edit</button>
+          </td>
+        </tr>
       ))}
     </tbody>
   );
