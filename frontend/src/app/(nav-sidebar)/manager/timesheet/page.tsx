@@ -8,7 +8,7 @@ import { useCallback, useState, useEffect } from "react";
 export default function TimesheetPage() {
   const param: timesheetQuery = {
     keyword: useState(""),
-    date: useState(""),
+    date: useState(new Date().toISOString().slice(0, 7)),
     index: useState("1"),
   }
   const [reloadFlag, setReloadFlag] = useState(0);

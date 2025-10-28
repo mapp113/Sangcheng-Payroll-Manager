@@ -4,7 +4,6 @@ import { timesheetQuery } from "@/app/_components/manager/timesheet/timesheet-pa
 
 export default function TimesheetToolbar({ param }: { param: timesheetQuery }) {
 
-
   return (
     <div className="flex p-3 box-border">
       <span className="mx-5 text-2xl font-bold">
@@ -14,7 +13,10 @@ export default function TimesheetToolbar({ param }: { param: timesheetQuery }) {
         <div className="flex items-center p-1 border border-black rounded-lg">
           <input
             className="focus:outline-0"
-            type="month" onChange={(e) => param.date[1](e.target.value)} />
+            type="month"
+            onChange={(e) => param.date[1](e.target.value)}
+            value={new Date().toISOString().slice(0, 7)}
+          />
         </div>
       </div>
     </div>
