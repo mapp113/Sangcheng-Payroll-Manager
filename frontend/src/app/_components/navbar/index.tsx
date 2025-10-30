@@ -14,41 +14,86 @@ const iceland = localFont({
 
 // Interface cho token payload
 interface JwtPayload {
-    sub: string; // username trong token
-    full_name: string;
+    // sub: string; // username trong token
+    // full_name: string;
+    sub?: string;
+    full_name?: string;
     exp?: number;
     iat?: number;
+}
+
+function decodeJwt(token: string): JwtPayload | null {
+    try {
+        const [, payloadSegment] = token.split(".");
+        if (!payloadSegment) {
+            return null;
+        }
+        const normalizedPayload = payloadSegment.replace(/-/g, "+").replace(/_/g, "/");
+        const jsonPayload = decodeURIComponent(
+            atob(normalizedPayload)
+                .split("")
+                .map((c) => `%${("00" + c.charCodeAt(0).toString(16)).slice(-2)}`)
+                .join("")
+        );
+        return JSON.parse(jsonPayload);
+    } catch (error) {
+        console.error("Failed to decode JWT payload", error);
+        return null;
+    }
 }
 
 export default function Navbar() {
     const pathname = usePathname();
     const noLayoutRoutes = ["/login", "/register"];
+    const shouldHideNavbar = pathname && noLayoutRoutes.includes(pathname);
     const [username, setUsername] = useState<string | null>(null);
 
     // Ẩn navbar ở các route không cần layout
     if (pathname && noLayoutRoutes.includes(pathname)) return null;
 
-    const dashboardTitle = pathname?.startsWith("/manager")
-        ? "Manager Dashboard"
-        : "HR Dashboard";
+    // const dashboardTitle = pathname?.startsWith("/manager")
+    //     ? "Manager Dashboard"
+    //     : "HR Dashboard";
+    const dashboardTitle = pathname?.startsWith("/admin")
+        ? "Admin Dashboard"
+        : pathname?.startsWith("/manager")
+            ? "Manager Dashboard"
+            : "HR Dashboard";
 
     useEffect(() => {
-        try {
-            const userStr = window.sessionStorage.getItem("scpm.auth.user");
-            if (!userStr) return;
+        // try {
+        //     const userStr = window.sessionStorage.getItem("scpm.auth.user");
+        //     if (!userStr) return;
+        const userStr = window.sessionStorage.getItem("scpm.auth.user");
+        if (!userStr) {
+            return;
+        }
 
+        try {
             const parsed = JSON.parse(userStr);
             const token = parsed?.token;
-            if (!token) return;
+            // if (!token) return;
+            if (!token) {
+                return;
+            }
 
             // Giải mã token để lấy sub
-            const decoded = jwtDecode<JwtPayload>(token);
-            setUsername(decoded.full_name || "Unknown User");
+            // const decoded = jwtDecode<JwtPayload>(token);
+            // setUsername(decoded.full_name || "Unknown User");
+            const decoded = decodeJwt(token);
+            if (!decoded) {
+                setUsername("Unknown User");
+                return;
+            }
+
+            setUsername(decoded.full_name || decoded.sub || "Unknown User");
         } catch (error) {
             console.error("JWT decode error:", error);
             setUsername("Unknown User");
         }
     }, []);
+
+    if (shouldHideNavbar) return null;
 
     return (
         <nav

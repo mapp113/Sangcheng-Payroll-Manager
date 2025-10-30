@@ -11,7 +11,7 @@ import {
     AuthCardHeader,
 } from "@app/_components/common/auth-card"
 
-import {login, resolveRedirectPath} from "../../_components/common/login"
+import {login, resolveRedirectPath} from "@app/_components/common/login"
 
 export default function LoginPage() {
     const [username, setUsername] = useState("")

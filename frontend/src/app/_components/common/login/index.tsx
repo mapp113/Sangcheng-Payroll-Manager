@@ -22,7 +22,13 @@ type LoginSuccessResponse = {
 type LoginErrorResponse = {
     message?: string
 }
-
+type JwtPayload = {
+    full_name?: string
+    name?: string
+    role?: {
+        name?: string
+    }
+}
 // ánh xạ role → đường dẫn
 const ROLE_REDIRECTS: Record<string, string> = {
     ADMIN: "/admin",
@@ -53,7 +59,8 @@ export async function login(payload: LoginPayload): Promise<AuthenticatedUser> {
 
     // ✅ Nếu thành công
     const data = (await response.json()) as LoginSuccessResponse
-    const decoded: any = jwtDecode(data.token)
+    //  const decoded: any = jwtDecode(data.token)
+    const decoded = jwtDecode<JwtPayload>(data.token)
 
     const fullName = decoded.full_name ?? decoded.name ?? ""
     const role = decoded.role?.name?.toUpperCase?.() ?? "EMPLOYEE"
