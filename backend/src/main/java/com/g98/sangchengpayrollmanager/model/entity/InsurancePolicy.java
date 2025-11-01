@@ -20,13 +20,13 @@ public class InsurancePolicy {
     @Column(length = 50, nullable = false)
     private String name;
 
-    @Column(name = "employee_percentage", precision = 3, scale = 2, nullable = false)
+    @Column(name = "employee_percentage", precision = 5, scale = 3, nullable = false)
     private BigDecimal employeePercentage;
 
     @Column(name = "max_amount", nullable = false)
     private Integer maxAmount;
 
-    @Column(name = "company_percentage", precision = 3, scale = 2, nullable = false)
+    @Column(name = "company_percentage", precision = 5, scale = 3, nullable = false)
     private BigDecimal companyPercentage;
 }
 

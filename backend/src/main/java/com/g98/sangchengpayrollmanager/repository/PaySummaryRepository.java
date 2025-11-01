@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PaySummaryRepository extends JpaRepository<PaySummary,Integer> {
@@ -55,4 +56,19 @@ public interface PaySummaryRepository extends JpaRepository<PaySummary,Integer> 
         """
     )
     Page<PaySummaryResponse> findSummariesByDate(@Param("date") LocalDate date, @Param("keyword") String keyword, Pageable pageable);
+
+    // tìm paysummary draft của 1 nhân viên trong 1 tháng
+    Optional<PaySummary> findByUserEmployeeCodeAndDateAndStatus(String employeeCode,
+                                                                LocalDate date,
+                                                                String status);
+
+    // tìm paysummaryDetail 1 nhân viên trong 1 tháng
+    @Query("""
+        select ps from PaySummary ps
+        left join fetch ps.components c
+        where ps.user.employeeCode = :employeeCode
+          and ps.date = :month
+    """)
+    Optional<PaySummary> findWithComponentsByEmployeeAndMonth(@Param("employeeCode") String employeeCode,
+                                                              @Param("month") LocalDate month);
 }

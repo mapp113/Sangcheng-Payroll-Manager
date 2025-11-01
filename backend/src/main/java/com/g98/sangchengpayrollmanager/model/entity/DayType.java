@@ -3,6 +3,8 @@ package com.g98.sangchengpayrollmanager.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "day_type")
 @Getter
@@ -21,5 +23,8 @@ public class DayType {
 
     @Column(length = 100)
     private String description;
+
+    @Column(name = "ot_rate" , precision = 4, scale = 2)
+    private BigDecimal otRate;
 }
 

@@ -34,6 +34,12 @@ public class SalaryInformation {
     @Column(name = "base_hourly_rate", nullable = false)
     private Integer baseHourlyRate;
 
+    @Column(name = "effective_from", nullable = false)
+    private LocalDate effectiveFrom;
+
+    @Column(name = "effective_to")
+    private LocalDate effectiveTo;
+
     @Column(name = "date")
     private LocalDate date;
 

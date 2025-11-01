@@ -46,6 +46,6 @@ public class EmployeeInformation {
     )
     private Position position;
 
-    @Column(name = "dependents_no", length = 10)
-    private String dependentsNo;
+    @Column(name = "dependents_no")
+    private Integer dependentsNo;
 }

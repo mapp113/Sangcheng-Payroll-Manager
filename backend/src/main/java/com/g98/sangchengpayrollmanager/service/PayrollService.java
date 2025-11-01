@@ -5,5 +5,5 @@ import com.g98.sangchengpayrollmanager.model.entity.PaySummary;
 import java.time.LocalDate;
 
 public interface PayrollService {
-    PaySummary calculateMonthlySalary(String employeeCode, LocalDate month);
+    PaySummary calculateMonthlySalary(String employeeCode, LocalDate month, LocalDate monthStart, LocalDate monthEnd);
 }
