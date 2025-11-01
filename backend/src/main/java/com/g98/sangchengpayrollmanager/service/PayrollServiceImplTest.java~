@@ -1,0 +1,25 @@
+package com.g98.sangchengpayrollmanager.service;
+
+import com.g98.sangchengpayrollmanager.service.impl.PayrollServiceImpl;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.time.LocalDate;
+
+@SpringBootTest
+class PayrollServiceImplTest {
+
+    @Autowired
+    private PayrollServiceImpl payrollService;
+
+    @Test
+    void testCalculateMonthlySalary() {
+        payrollService.calculateMonthlySalary(
+                "EMP001",
+                LocalDate.of(2025, 10, 1),
+                LocalDate.of(2025, 10, 1),
+                LocalDate.of(2025, 10, 31)
+        );
+    }
+}

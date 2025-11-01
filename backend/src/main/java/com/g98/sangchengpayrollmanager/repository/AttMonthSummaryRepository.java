@@ -13,7 +13,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 
 public interface AttMonthSummaryRepository extends JpaRepository<AttMonthSummary,Integer> {
-    //public AttMonthSummary findByUserEmployeeCodeAndMonth(String employeeCode, LocalDate month);
+    AttMonthSummary findByUserEmployeeCodeAndMonth(String employeeCode, LocalDate month);
 
     @Query(
             value = """

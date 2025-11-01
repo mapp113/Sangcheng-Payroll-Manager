@@ -38,5 +38,11 @@ public class AttDailySummary {
 
     @Column(name = "is_payable_day")
     private Boolean isPayableDay;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "day_type_id")
+    private DayType dayType;
+
+
 }
 

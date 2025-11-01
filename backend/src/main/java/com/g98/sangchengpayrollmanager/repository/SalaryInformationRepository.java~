@@ -14,7 +14,7 @@ public interface SalaryInformationRepository extends JpaRepository<SalaryInforma
         WHERE s.user.employeeCode = :employeeCode
           AND (
                 (s.effectiveTo >= :monthStart AND s.effectiveTo <= :monthEnd)
-                OR (s.effectiveTo is null AND s.effectiveFrom <= :monthEnd)
+                OR (s.effectiveTo = null AND s.effectiveFrom <= :monthEnd)
               )
     """)
     List<SalaryInformation> findActiveByEmployeeCode(@Param("employeeCode") String employeeCode, @Param("monthStart") LocalDate monthStart, @Param("monthEnd") LocalDate monthEnd);

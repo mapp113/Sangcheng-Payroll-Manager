@@ -21,13 +21,13 @@ public class TaxLevel {
     private String name;
 
     // 'from' là từ khóa SQL nên phải đặt tên cột bằng backtick
-    @Column(name = "`from`", length = 10, nullable = false)
-    private String fromValue;
+    @Column(name = "`from`", nullable = false)
+    private Integer fromValue;
 
     @Column(name = "to", nullable = false)
     private Integer toValue;
 
-    @Column(precision = 3, scale = 2, nullable = false)
+    @Column(precision = 5, scale = 3, nullable = false)
     private BigDecimal percentage;
 }
 

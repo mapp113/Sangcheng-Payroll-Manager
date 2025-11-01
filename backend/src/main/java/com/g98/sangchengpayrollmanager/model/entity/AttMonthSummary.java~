@@ -37,10 +37,16 @@ public class AttMonthSummary {
     @Column(name = "days_payable", precision = 10, scale = 2, nullable = false)
     private BigDecimal daysPayable;
 
-    @Column(name = "ot_hours", precision = 10, scale = 2, nullable = false)
-    private BigDecimal otHours;
+    @Column(name = "ot_hours",nullable = false)
+    private Integer otHours;
 
     @Column(name = "days_hours", nullable = false)
     private Integer daysHours;
+
+    @Column(name = "used_leave",nullable = false)
+    private Integer usedleave;
+
+    @Column(name = "days_payable", precision = 10, scale = 2, nullable = false)
+    private BigDecimal daysPayable;
 }
 

@@ -30,5 +30,12 @@ public class PayComponentType {
 
     @Column(name = "is_insured", nullable = false)
     private Boolean isInsured;
+
+    @Column(name = "tax_treatment_code", length = 50)
+    private String taxTreatmentCode;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "policy_code", referencedColumnName = "code")
+    private LegalPolicy policy;
 }
 

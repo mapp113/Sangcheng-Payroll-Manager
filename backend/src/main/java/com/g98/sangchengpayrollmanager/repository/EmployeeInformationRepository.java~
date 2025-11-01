@@ -1,0 +1,9 @@
+package com.g98.sangchengpayrollmanager.repository;
+
+import com.g98.sangchengpayrollmanager.model.entity.EmployeeInformation;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface EmployeeInformationRepository extends JpaRepository<EmployeeInformation, Integer> {
+    // Tìm theo mã nhân viên trong entity User (trong quan hệ OneToOne)
+    EmployeeInformation findByUserEmployeeCode(String employeeCode);
+}

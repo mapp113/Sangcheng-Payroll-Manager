@@ -46,5 +46,8 @@ public class PayComponent {
 
     @Column(precision = 3, scale = 2)
     private BigDecimal percent;
+
+    @Column(name = "is_addition", nullable = false)
+    private Boolean isAddition;
 }
 
