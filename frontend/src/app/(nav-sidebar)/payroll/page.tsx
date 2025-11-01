@@ -1,16 +1,28 @@
-import PayrollTable from "@/app/_components/payroll-table";
-import PayrollToolbar from "@/app/_components/payroll-toolbar";
+"use client"
 
-export default function payrollPage() {
+import { DataContext, ParamsContext } from "@/app/_components/payroll/payroll-context";
+import PayrollTable from "@/app/_components/payroll/table";
+import PayrollToolbar from "@/app/_components/payroll/toolbar";
+import { PayrollParam, PayrollRecord } from "@/app/_components/payroll/type";
+import { useState } from "react";
+
+
+export default function PayrollPage() {
+  const [payrollParams, setPayrollParams] = useState<PayrollParam>({
+    keyword: "",
+    sortBy: "",
+    date: false ? new Date().toISOString().slice(0, 7) : "2025-10",
+    page: "0",
+    totalPage: "",
+  });
+  const [payrollData, setPayrollData] = useState<PayrollRecord[]>([]);
+  
   return (
-    <div className="flex flex-col h-full p-3 box-border">
-      <PayrollToolbar />
-      <div className="flex-1 mt-2">
-        {/* Vùng bảng chiếm hết phần còn lại, không cuộn */}
-        <section className="h-full rounded-xl flex flex-col justify-between">
-          <PayrollTable />
-        </section>
-      </div>
-    </div>
+    <ParamsContext.Provider value={{ payrollParams, setPayrollParams }}>
+      <DataContext.Provider value={{ payrollData, setPayrollData }}>
+        <PayrollToolbar />
+        <PayrollTable />
+      </DataContext.Provider>
+    </ParamsContext.Provider>
   );
 }

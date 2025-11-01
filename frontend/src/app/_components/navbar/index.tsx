@@ -131,6 +131,7 @@ export default function Navbar() {
 
                 <CircleChevronDown/>
             </div>
+
         </nav>
     );
 }
