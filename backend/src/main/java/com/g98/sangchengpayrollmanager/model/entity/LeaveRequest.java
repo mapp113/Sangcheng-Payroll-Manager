@@ -47,5 +47,12 @@ public class LeaveRequest {
 
     @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate;
+
+    @Column(name = "approved_date")
+    private LocalDateTime approvedDate;
+
+    @Column(name = "approved_by")
+    private String approvedBy;
+
 }
 
