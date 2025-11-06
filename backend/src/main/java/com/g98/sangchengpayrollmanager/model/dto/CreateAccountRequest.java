@@ -28,6 +28,8 @@ public class CreateAccountRequest {
 
     private Long roleId; // map sang bảng hrm.role
 
+    private String devicePin;
+
     // 1 = hoạt động, 0 = tạm khóa
     @Builder.Default
     private Integer status = 1;

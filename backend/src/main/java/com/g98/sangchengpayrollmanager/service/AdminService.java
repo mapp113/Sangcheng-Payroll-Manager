@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -25,6 +27,8 @@ import java.util.regex.Pattern;
 public class AdminService {
 
     private final AdminRepository adminRepository;
+    private final BiometricSyncService biometricSyncService;
+
 
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -55,12 +59,22 @@ public class AdminService {
                 .toList();
     }
 
+    private boolean portOpen(String host, int port, int timeoutMs) {
+        try (Socket s = new Socket()) {
+            s.connect(new InetSocketAddress(host, port), timeoutMs);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+
     public ApiResponse<?> createAccount(CreateAccountRequest req) {
         String username = normalize(req.getUsername());
         String email = normalize(req.getEmail());
         String phoneNo = normalize(req.getPhoneNo());
 
-        // -1. validate dữ liệu đầu vào
+        // -1. Validate dữ liệu đầu vào
         if (!hasMinimumLength(username, 6)) {
             return ApiResponse.builder()
                     .status(400)
@@ -82,7 +96,7 @@ public class AdminService {
                     .build();
         }
 
-        // 0. check trùng employee_code (PK)
+        // 0. Check trùng employee_code (PK)
         if (adminRepository.existsById(req.getEmployeeCode())) {
             return ApiResponse.builder()
                     .status(400)
@@ -90,8 +104,7 @@ public class AdminService {
                     .build();
         }
 
-        // 1. check trùng username
-
+        // 1. Check trùng username
         if (adminRepository.existsByUsername(username)) {
             return ApiResponse.builder()
                     .status(400)
@@ -99,8 +112,7 @@ public class AdminService {
                     .build();
         }
 
-        // 2. check trùng email
-
+        // 2. Check trùng email
         if (adminRepository.existsByEmail(email)) {
             return ApiResponse.builder()
                     .status(400)
@@ -108,34 +120,58 @@ public class AdminService {
                     .build();
         }
 
-        // 3. lấy role
         var role = roleRepository.findById(req.getRoleId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy role id = " + req.getRoleId()));
 
-        // 4. build user
         var user = User.builder()
                 .employeeCode(req.getEmployeeCode())
                 .fullName(req.getFullName())
-
                 .username(username)
                 .password(passwordEncoder.encode(req.getPassword()))
-
                 .email(email)
                 .dob(req.getDob() != null && !req.getDob().isBlank()
-
                         ? java.time.LocalDate.parse(req.getDob().trim())
                         : java.time.LocalDate.of(2000, 1, 1))
-
                 .phoneNo(phoneNo)
                 .role(role)
                 .status(req.getStatus() != null ? req.getStatus() : 1)
                 .build();
 
+        boolean isAdmin = req.getRoleId() != null && req.getRoleId() == 1L;
+        String devicePin = req.getDevicePin() != null ? req.getDevicePin().trim() : "";
+        String ip = "192.168.0.2";
+
+        // Pre-check TCP để fail nhanh khi máy offline (2s)
+        if (!portOpen(ip, 4370, 2000)) {
+            return ApiResponse.builder()
+                    .status(502)
+                    .message("Thiết bị offline (port 4370 không mở)")
+                    .build();
+        }
+
+        // Push user với timeout 30s
+        boolean pushed = biometricSyncService.pushUserBlocking(
+                user.getEmployeeCode(),
+                user.getFullName(),
+                devicePin,
+                isAdmin,
+                30000
+        );
+
+        if (!pushed) {
+            return ApiResponse.builder()
+                    .status(502)
+                    .message("Không thể đồng bộ với thiết bị (timeout hoặc lỗi)")
+                    .build();
+        }
+
+        // Lưu user vào DB
         adminRepository.save(user);
 
+        // TRẢ RESPONSE NGAY - cleanup ZK đang chạy background
         return ApiResponse.builder()
                 .status(200)
-                .message("Tạo tài khoản thành công")
+                .message("Tạo tài khoản thành công & đã đồng bộ máy chấm công")
                 .data(UserMapper.toDTO(user))
                 .build();
     }
@@ -173,7 +209,7 @@ public class AdminService {
         }
 
         if (req.getPhoneNo() != null) {
-          
+
             String newPhoneNo = normalize(req.getPhoneNo());
             if (!isValidPhone(newPhoneNo)) {
                 return ApiResponse.builder()
