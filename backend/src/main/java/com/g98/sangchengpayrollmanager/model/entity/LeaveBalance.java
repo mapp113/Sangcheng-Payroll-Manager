@@ -17,7 +17,7 @@ public class LeaveBalance {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_code", nullable = false)
+    @JoinColumn(name = "employee_code", nullable = false) // lấy employee_code thành tên nhân viên
     private User user;
 
     @Column
