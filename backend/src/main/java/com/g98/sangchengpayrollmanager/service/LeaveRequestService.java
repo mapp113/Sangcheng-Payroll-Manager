@@ -17,6 +17,9 @@ public interface LeaveRequestService {
     // Lấy toàn bộ các yêu cầu đang chờ
     List<LeaveRequestResponse> getPendingLeaveRequests();
 
+    //Lấy chi tiết yêu cầu
+    LeaveRequestResponse getLeaveRequestDetail(Integer id);
+
     //HR duyệt yêu cầu
     LeaveRequestResponse approveLeaveRequest(Integer id, String note);
 

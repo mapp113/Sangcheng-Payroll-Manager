@@ -17,7 +17,7 @@ import java.time.LocalDate;
 
 public class LeaveRequestResponse {
 
-    // private Integer id;
+    private Integer id;
     private String employeeCode;
     private String fullName;
     private LeaveType leaveType;

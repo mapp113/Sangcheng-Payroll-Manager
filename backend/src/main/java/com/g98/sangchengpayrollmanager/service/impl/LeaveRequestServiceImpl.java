@@ -40,6 +40,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         LeaveType leaveType = leaveTypeRepository.findByCode(leaveRequestDTO.getLeaveType())
                 .orElseThrow(() -> new RuntimeException("Leave type not found: " + leaveRequestDTO.getLeaveType()));
 
+
         if (Boolean.TRUE.equals(leaveType.getIsCountedAsLeave())) {
             LeaveBalance balance = leaveBalanceRepository.findByEmployeeCode(user.getEmployeeCode())
                     .orElseThrow(() -> new RuntimeException("Leave balance not found: " + user.getEmployeeCode()));
@@ -52,11 +53,12 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
 
 
             balance.setBalance((int) (balance.getBalance() - requestedDays));
+
             leaveBalanceRepository.save(balance);
         }
 
 
-        LeaveRequest leaveRequest = mapToEntity(leaveRequestDTO, user);
+        LeaveRequest leaveRequest = mapToEntity(leaveRequestDTO, user, leaveType);
         LeaveRequest savedLeaveRequest = LeaveRequestRepository.save(leaveRequest);
 
         return mapToResponse(savedLeaveRequest);
@@ -65,6 +67,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     private double calculateLeaveDays(LocalDate fromDate, LocalDate toDate, String duration) {
         return 0;
     }
+
 
     @Override
     public List<LeaveRequestResponse> getAllLeaveRequests() {
@@ -82,10 +85,19 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     }
 
     @Override
+    public LeaveRequestResponse getLeaveRequestDetail(Integer id) {
+        LeaveRequest leaveRequest = LeaveRequestRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Leave request not found: " + id));
+
+        User user = leaveRequest.getUser();
+        return mapToResponse(leaveRequest);
+    }
+
+    @Override
     public LeaveRequestResponse approveLeaveRequest(Integer id, String reason) {
         LeaveRequest leaveRequest = LeaveRequestRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Leave request not found"));
-        leaveRequest.setStatus(String.valueOf(LeaveandOTStatus.APPROVED));
+        leaveRequest.setStatus(LeaveandOTStatus.APPROVED.name());
         leaveRequest.setReason(reason);
         leaveRequest.setApprovedDate(LocalDateTime.now());
 
@@ -98,7 +110,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     public LeaveRequestResponse rejectLeaveRequest(Integer id, String reason) {
         LeaveRequest leaveRequest = LeaveRequestRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Leave request not found"));
-        leaveRequest.setStatus(String.valueOf(LeaveandOTStatus.REJECTED));
+        leaveRequest.setStatus(LeaveandOTStatus.REJECTED.name());
         leaveRequest.setReason(reason);
         leaveRequest.setApprovedDate(LocalDateTime.now());
 
@@ -107,22 +119,23 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
 
 
 
-    private LeaveRequest mapToEntity(LeaveRequestCreateDTO dto, User user) {
+    private LeaveRequest mapToEntity(LeaveRequestCreateDTO dto, User user, LeaveType leaveType) {
         LeaveRequest entity = new LeaveRequest();
         entity.setUser(user);
+        entity.setLeaveType(leaveType);
         entity.setFromDate(dto.getFromDate());
         entity.setToDate(dto.getToDate());
         entity.setDurationType(DurationType.valueOf(dto.getDuration()));
-        entity.setIsPaidLeave(false);
+        entity.setIsPaidLeave(Boolean.TRUE.equals(leaveType.getIsPaid()));
         entity.setReason(dto.getReason());
-        entity.setStatus(String.valueOf(LeaveandOTStatus.PENDING));
+        entity.setStatus(LeaveandOTStatus.PENDING.name());
         entity.setCreatedDate(LocalDateTime.now());
         return entity;
     }
 
     private LeaveRequestResponse mapToResponse(LeaveRequest entity) {
         return LeaveRequestResponse.builder()
-               // .id(entity.getId())
+                .id(entity.getId())
                 .employeeCode(entity.getUser().getEmployeeCode())
                 .fullName(entity.getUser().getFullName())
                 .leaveType(entity.getLeaveType())
