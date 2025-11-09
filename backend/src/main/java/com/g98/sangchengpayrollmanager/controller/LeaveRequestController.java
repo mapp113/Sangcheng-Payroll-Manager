@@ -6,12 +6,15 @@ import com.g98.sangchengpayrollmanager.model.dto.LeaveandOTRequestUpdateDTO;
 import com.g98.sangchengpayrollmanager.model.dto.leave.LeaveRequestResponse;
 import com.g98.sangchengpayrollmanager.model.entity.LeaveRequest;
 import com.g98.sangchengpayrollmanager.service.LeaveRequestService;
+import com.g98.sangchengpayrollmanager.service.validator.LeaveRequestValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -20,13 +23,18 @@ import java.util.List;
 public class LeaveRequestController {
 
     private final LeaveRequestService leaveRequestService;
+    private final LeaveRequestValidator validator;
 
 
     // Submit
     @PostMapping("/submit")
     public ResponseEntity<LeaveRequestResponse> submitLeaveRequest(@RequestBody LeaveRequestCreateDTO requestDTO) {
-        LeaveRequestResponse response = leaveRequestService.submitLeaveRequest(requestDTO);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        validator.validateLeaveRequest(requestDTO);
+        Integer id = leaveRequestService.submitLeaveRequest(requestDTO).getId();
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest().path("/{id}")
+                .buildAndExpand(id).toUri();
+        return ResponseEntity.created(location).build();
     }
 
     @GetMapping("/all")
