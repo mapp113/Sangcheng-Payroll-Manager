@@ -4,6 +4,7 @@ import com.g98.sangchengpayrollmanager.model.dto.LeaveRequestCreateDTO;
 import com.g98.sangchengpayrollmanager.model.entity.LeaveType;
 import com.g98.sangchengpayrollmanager.model.entity.User;
 import com.g98.sangchengpayrollmanager.model.enums.DurationType;
+import com.g98.sangchengpayrollmanager.repository.LeaveQuotaRepository;
 import com.g98.sangchengpayrollmanager.repository.LeaveTypeRepository;
 import com.g98.sangchengpayrollmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,8 @@ public class LeaveRequestValidator {
 
     private final UserRepository userRepository;
     private final LeaveTypeRepository leaveTypeRepository;
+    private final LeaveQuotaRepository leaveQuotaRepository;
 
-    /** Kết quả validate để service dùng tiếp (đỡ lookup lại) */
     public record ValidatedLeaveInputs(
             LeaveType leaveType,
             DurationType durationType

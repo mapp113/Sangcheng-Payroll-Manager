@@ -20,7 +20,6 @@ public class LeaveRequestResponse {
     private String employeeCode;
     private String fullName;
     private String leaveTypeCode;
-    private String leaveTypeName;
     private String reason;
     private LocalDate fromDate;
     private LocalDate toDate;
