@@ -27,8 +27,8 @@ public class LeaveRequestController {
 
 
     // Submit
-    @PostMapping("/submit")
-    public ResponseEntity<LeaveRequestResponse> submitLeaveRequest(@RequestBody LeaveRequestCreateDTO requestDTO) {
+    @PostMapping(value = "/submit", consumes = {"multipart/form-data"})
+    public ResponseEntity<LeaveRequestResponse> submitLeaveRequest(@ModelAttribute  LeaveRequestCreateDTO requestDTO) {
         validator.validateLeaveRequest(requestDTO);
         Integer id = leaveRequestService.submitLeaveRequest(requestDTO).getId();
         URI location = ServletUriComponentsBuilder
