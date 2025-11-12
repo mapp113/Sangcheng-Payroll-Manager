@@ -1,5 +1,6 @@
 package com.g98.sangchengpayrollmanager.device;
 
+import com.g98.sangchengpayrollmanager.util.JacobLoader;
 import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.Dispatch;
 import com.jacob.com.Variant;
@@ -33,9 +34,11 @@ public class ZKTecoClient {
     private String devicePassword;
 
     static {
-        System.setProperty(com.jacob.com.LibraryLoader.JACOB_DLL_PATH,
-                "C:/Users/Admin/Downloads/jacob-1.20-x64.dll");
-        com.jacob.com.LibraryLoader.loadJacobLibrary();
+        try {
+            JacobLoader.loadJacobFromResources();
+        } catch (Exception e) {
+            throw new RuntimeException("Không nạp được JACOB DLL", e);
+        }
     }
 
     private ActiveXComponent connect() {
