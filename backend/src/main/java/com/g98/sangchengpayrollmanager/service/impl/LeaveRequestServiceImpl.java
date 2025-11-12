@@ -137,12 +137,10 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     @Override
     public Page<LeaveRequestResponse> findByStatus(LeaveandOTStatus status, Pageable pageable) {
         return LeaveRequestRepository
-                .findByStatus(String.valueOf(status), pageable)
+                .findByStatus(LeaveandOTStatus.valueOf(String.valueOf(status)), pageable)
                 .map(this::mapToResponse);
 
     }
-
-
 
 
     @Override
