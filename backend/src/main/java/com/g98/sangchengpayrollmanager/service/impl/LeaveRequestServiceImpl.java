@@ -241,6 +241,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
                 .reason(entity.getReason())
                 .duration(entity.getDurationType())
                 .isPaidLeave(entity.getIsPaidLeave())
+                .file(entity.getAttachmentPath())
                 .status(LeaveandOTStatus.valueOf(entity.getStatus()))
                 .approvalDate(entity.getApprovedDate() != null ?
                         entity.getApprovedDate().toLocalDate() : null)
