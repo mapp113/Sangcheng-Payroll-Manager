@@ -12,7 +12,6 @@ import java.time.LocalDate;
 
 public class LeaveRequestCreateDTO {
 
-    private String employeeCode;
    // private String fullName;
 
     @NotNull

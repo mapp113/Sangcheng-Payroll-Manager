@@ -71,9 +71,24 @@ public class LeaveRequestController {
             @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<LeaveRequestResponse> response = leaveRequestService.findByEmployeeCode(employeeCode, pageable);
+        Page<LeaveRequestResponse> response = leaveRequestService.searchLeaveRequests(employeeCode, pageable);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<LeaveRequestResponse>> searchLeaveRequest(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<LeaveRequestResponse> response =
+                leaveRequestService.searchLeaveRequests(keyword, pageable);
+
+        return ResponseEntity.ok(response);
+    }
+
 
 
     @GetMapping("/status")
@@ -95,11 +110,13 @@ public class LeaveRequestController {
 
 
 
+
         @GetMapping("/detail/{id}")
     public ResponseEntity<LeaveRequestResponse> getLeaveRequestDetail(@PathVariable Integer id) {
         LeaveRequestResponse response = leaveRequestService.getLeaveRequestDetail(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
 
     @PutMapping("/approve/{id}")
     public ResponseEntity<LeaveRequestResponse> approveLeaveRequest
@@ -116,6 +133,7 @@ public class LeaveRequestController {
         leaveRequestService.rejectLeaveRequest(id, updateDTO.getNote());
         return ResponseEntity.noContent().build();
     }
+
 
     private Pageable toPageable(Integer page, Integer size, String sort) {
         String[] parts = sort.split(",");

@@ -26,6 +26,7 @@ public class LeaveRequestResponse {
     private DurationType duration;
     private boolean isPaidLeave;
     private LeaveandOTStatus status;
+    private LocalDate createDate;
     private LocalDate approvalDate;
     private String note;
     private String file;

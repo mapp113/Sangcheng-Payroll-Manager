@@ -17,6 +17,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -37,9 +39,13 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
 
     @Override
     public LeaveRequestResponse submitLeaveRequest(LeaveRequestCreateDTO leaveRequestDTO) {
+
+        String employeeCode = getCurrenUserName();
+
+
      try {
-         User user = userRepository.findByEmployeeCode(leaveRequestDTO.getEmployeeCode())
-                 .orElseThrow(() -> new RuntimeException("User not found: " + leaveRequestDTO.getEmployeeCode()));
+         User user = userRepository.findByEmployeeCode(employeeCode)
+                 .orElseThrow(() -> new RuntimeException("User not found: " + employeeCode));
 
          LeaveType leaveType = leaveTypeRepository.findByCode(leaveRequestDTO.getLeaveType())
                  .orElseThrow(() -> new RuntimeException("Leave type not found: " + leaveRequestDTO.getLeaveType()));
@@ -222,6 +228,14 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     }
 
 
+    public static String getCurrenUserName() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) {
+            throw new RuntimeException("ko co nguoi dung");
+        }
+        return auth.getName();
+    }
+
 
     private LeaveRequest mapToEntity(LeaveRequestCreateDTO dto, User user, LeaveType leaveType, boolean isPaidByType) {
         LeaveRequest entity = new LeaveRequest();
@@ -249,6 +263,9 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
                 .duration(entity.getDurationType())
                 .isPaidLeave(entity.getIsPaidLeave())
                 .file(entity.getAttachmentPath())
+                .createDate(entity.getCreatedDate() != null
+                        ? entity.getCreatedDate().toLocalDate()
+                        : null)
                 .status(LeaveandOTStatus.valueOf(entity.getStatus()))
                 .approvalDate(entity.getApprovedDate() != null ?
                         entity.getApprovedDate().toLocalDate() : null)
