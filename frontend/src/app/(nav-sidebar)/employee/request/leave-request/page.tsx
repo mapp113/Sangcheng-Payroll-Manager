@@ -43,7 +43,7 @@ export default function LeavesPage() {
   };
 
   const handleSubmit = async () => {
-    // console.log("Form Data:", formData);
+    //console.log("Form Data:", formData);
 
     // Tạo FormData cho multipart/form-data
     const formDataToSend = new FormData();
@@ -61,8 +61,12 @@ export default function LeavesPage() {
 
     // Gửi request
     try {
+      const token = sessionStorage.getItem("scpm.auth.token");
       const response = await fetch("http://localhost:8080/api/leave/submit", {
         method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
         body: formDataToSend,
         // Không cần set Content-Type header, browser sẽ tự động set cho multipart/form-data
       });
