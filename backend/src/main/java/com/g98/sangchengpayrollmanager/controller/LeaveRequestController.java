@@ -69,11 +69,8 @@ public class LeaveRequestController {
         if (keyword != null && !keyword.trim().isEmpty()) {
             result = leaveRequestService.searchLeaveRequests(keyword, pageable);
         }
-        else if (month != null || year != null) {
-            result = leaveRequestService.getAllLeaveRequests(month, year, pageable);
-        }
         else {
-            result = leaveRequestService.getAllLeaveRequests(pageable);
+            result = leaveRequestService.getAllLeaveRequests(month, year, pageable);
         }
 
         return ResponseEntity.ok(result);
@@ -90,6 +87,20 @@ public class LeaveRequestController {
         Pageable pageable = toPageable(page, size, sort);
         Page<LeaveRequestResponse> result = leaveRequestService.getMyLeaveRequests(pageable);
         return ResponseEntity.ok(result);
+    }
+
+    // xem chi tiết yêu cầu ( của mình )
+    @GetMapping("/myrequest/{id}")
+    public ResponseEntity<LeaveRequestResponse> getMyLeaveRequestDetail(@PathVariable Integer id) {
+        LeaveRequestResponse response = leaveRequestService.getMyLeaveRequestDetail(id);
+        return ResponseEntity.ok(response);
+    }
+
+    // xóa yêu cầu trước khi được duyệt
+    @DeleteMapping("/myrequest/{id}")
+    public ResponseEntity<?> deleteMyRequest(@PathVariable Integer id) {
+        leaveRequestService.deleteMyLeaveRequest(id);
+        return ResponseEntity.noContent().build();
     }
 
 

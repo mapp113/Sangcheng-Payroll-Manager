@@ -143,14 +143,35 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     }
 
 
-    // Lấy cho Manager xem
+    // Xóa đơn chưa duyệt
     @Override
-    public Page<LeaveRequestResponse> getAllLeaveRequests(Pageable pageable) {
-        return LeaveRequestRepository
-                .findAll(pageable)
-                .map(this::mapToResponse);
+    public void deleteMyLeaveRequest(Integer id) {
+        String username = getCurrentUsername();
+
+        User user  = userRepository.findByUsernameWithRole(username)
+                .orElseThrow(() -> new RuntimeException("người không tồn tại: " + username));
+
+        LeaveRequest leaveRequest = LeaveRequestRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Yêu cầu không tồn tại: " + id));
+
+        if(!leaveRequest.getUser().getEmployeeCode().equals(user.getEmployeeCode())) {
+            throw new RuntimeException("Xóa đơn nghỉ của chính mình.");
+        }
+
+        if (!LeaveandOTStatus.PENDING.name().equals(leaveRequest.getStatus())) {
+            throw new IllegalArgumentException(" Chỉ được xóa đơn ở trạng thái PENDING");
+        }
+        LeaveRequestRepository.delete(leaveRequest);
     }
 
+
+    // Lấy cho Manager xem
+    @Override
+    public Page<LeaveRequestResponse> getAllLeaveRequests(Integer month, Integer year, Pageable pageable) {
+        Page<LeaveRequest> page = LeaveRequestRepository
+                .filterByMonthYear(month, year, pageable);
+        return page.map(this::mapToResponse);
+    }
 
     // Laays cho Employee xem của người ta
 
@@ -165,6 +186,25 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
                 .findByUser_EmployeeCode(user.getEmployeeCode(), pageable)
                 .map(this::mapToResponse);
     }
+
+    // Xem chi tiết yêu câầu ccuar người
+    @Override
+    public LeaveRequestResponse getMyLeaveRequestDetail(Integer id) {
+        String username = LeaveRequestServiceImpl.getCurrentUsername();
+
+        User user = userRepository.findByUsernameWithRole(username)
+                .orElseThrow(() -> new RuntimeException("Người không tồn tại" + username));
+
+        LeaveRequest request = LeaveRequestRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn nghỉ"));
+
+        if (!request.getUser().getEmployeeCode().equals(user.getEmployeeCode())) {
+            throw new RuntimeException("Bạn không có quyền xem đơn nghỉ của người khác");
+        }
+
+        return mapToResponse(request);
+    }
+
 
     @Override
     public Page<LeaveRequestResponse> findByStatus(LeaveandOTStatus status, Pageable pageable) {
@@ -184,12 +224,6 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         return pageResult.map(this::mapToResponse);
     }
 
-    @Override
-    public Page<LeaveRequestResponse> getAllLeaveRequests(Integer month, Integer year, Pageable pageable) {
-        Page<LeaveRequest> page = LeaveRequestRepository
-                .filterByMonthYear(month, year, pageable);
-        return page.map(this::mapToResponse);
-    }
 
 
     @Override

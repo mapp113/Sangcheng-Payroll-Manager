@@ -13,13 +13,11 @@ public interface LeaveRequestService {
     // Nhân viên gửi yêu cầu nghỉ
     LeaveRequestResponse submitLeaveRequest(LeaveRequestCreateDTO leaveRequest);
 
-
-    // Lấy toàn bộ các yêu cầu cho HR
-    Page<LeaveRequestResponse> getAllLeaveRequests(Pageable pageable);
-
     // Lấy toàn bộ yêu cầu theo user ( cho employee xem )
     Page<LeaveRequestResponse> getMyLeaveRequests(Pageable pageable);
 
+    // Lay chi tiết các yêu cầu của nhân viên đó
+    LeaveRequestResponse getMyLeaveRequestDetail(Integer id);
 
     // Lấy toàn bộ các yêu cầu theo trạng thái
     Page<LeaveRequestResponse> findByStatus(LeaveandOTStatus status, Pageable pageable);
@@ -27,18 +25,21 @@ public interface LeaveRequestService {
     // Search theo mã  nhân viên
     Page<LeaveRequestResponse> searchLeaveRequests(String keyword, Pageable pageable);
 
-    // tra theo tháng năm
-    Page<LeaveRequestResponse> getAllLeaveRequests(Integer month, Integer year, Pageable pageable);
-
-
+    // kiểm tra số ngày nghỉ còn lai
     double getMyAnnualRemainingLeave();
+
+    // Xóa đơn xin nghỉ chưa được duyệt
+    void deleteMyLeaveRequest(Integer id);
+
+    // Lấy yêu cầu cho Manager xem
+    Page<LeaveRequestResponse> getAllLeaveRequests(Integer month, Integer year, Pageable pageable);
 
     //Lấy chi tiết yêu cầu
     LeaveRequestResponse getLeaveRequestDetail(Integer id);
 
-    //HR duyệt yêu cầu
+    //Manager duyệt yêu cầu
     LeaveRequestResponse approveLeaveRequest(Integer id, String note);
 
-    // HR từ chối yêu cầu
+    // Manager từ chối yêu cầu
     LeaveRequestResponse rejectLeaveRequest(Integer id, String note);
 }
