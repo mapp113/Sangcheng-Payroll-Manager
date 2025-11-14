@@ -34,6 +34,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     private final LeaveRequestRepository LeaveRequestRepository;
     private final LeaveTypeRepository leaveTypeRepository;
     private final LeaveQuotaRepository leaveQuotaRepository;
+    private static final String ANNUAL_LEAVE_CODE = "annual";
 
     @Override
     public LeaveRequestResponse submitLeaveRequest(LeaveRequestCreateDTO leaveRequestDTO) {
@@ -101,7 +102,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
 
 
 
-
+// tính toán số ngày nghỉ
     private double calculateLeaveDays(LocalDate fromDate, LocalDate toDate, String duration) {
        DurationType durationType = DurationType.valueOf(duration.trim().toUpperCase());
        switch (durationType) {
@@ -116,8 +117,33 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
        }
     }
 
+    // Tinh số ngày còn lại của nghỉ phép năm
+    @Override
+    public double getMyAnnualRemainingLeave() {
 
-    // ấy cho Manager xem
+        String username = getCurrentUsername();
+
+        User user  = userRepository.findByUsernameWithRole(username)
+                .orElseThrow(() -> new RuntimeException("người không tồn tại: " + username));
+
+        String  empCode = user.getEmployeeCode();
+        int year = LocalDate.now().getYear();
+
+        LeaveQuota quota = leaveQuotaRepository
+                .findByEmployeeCodeAndLeaveTypeCodeAndYear(empCode, ANNUAL_LEAVE_CODE, year)
+                .orElseThrow(() -> new RuntimeException("Chưa có quota thành viên này trong năm nay"));
+        Double entitledDays = quota.getEntitledDays();
+        Double carried = quota.getCarriedOver() == null ? 0.0 : quota.getCarriedOver();
+        Double used = quota.getUsedDays() == null ? 0.0 : quota.getUsedDays();
+
+        double remainingDays = Math.max((entitledDays+ carried)- used, 0.0);
+
+        return remainingDays;
+
+    }
+
+
+    // Lấy cho Manager xem
     @Override
     public Page<LeaveRequestResponse> getAllLeaveRequests(Pageable pageable) {
         return LeaveRequestRepository
@@ -129,9 +155,14 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     // Laays cho Employee xem của người ta
 
     @Override
-    public Page<LeaveRequestResponse> findByUser_Id(String employeeCode, Pageable pageable) {
+    public Page<LeaveRequestResponse> getMyLeaveRequests(Pageable pageable) {
+        String username = getCurrentUsername();
+
+        User user = userRepository.findByUsernameWithRole(username)
+                .orElseThrow(() -> new RuntimeException("người ko tồn tại: " + username));
+
         return LeaveRequestRepository
-                .findByUser_EmployeeCode(employeeCode, pageable)
+                .findByUser_EmployeeCode(user.getEmployeeCode(), pageable)
                 .map(this::mapToResponse);
     }
 

@@ -39,7 +39,7 @@ public class LeaveRequestController {
         return ResponseEntity.ok(options);
     }
 
-    // Submit
+    // Submit request của employee
     @PostMapping(value = "/submit", consumes = {"multipart/form-data"})
     public ResponseEntity<LeaveRequestResponse> submitLeaveRequest(@ModelAttribute  LeaveRequestCreateDTO requestDTO) {
 
@@ -52,6 +52,7 @@ public class LeaveRequestController {
         return ResponseEntity.created(location).build();
     }
 
+    // Lấy leave request cho anager xem
     @GetMapping("/all")
     public ResponseEntity<Page<LeaveRequestResponse>> getAllOrSearch(
             @RequestParam(required = false) String keyword,
@@ -79,15 +80,15 @@ public class LeaveRequestController {
     }
 
 
-
-    @GetMapping("/user/{userId}")  // Employee xem trang
-    public ResponseEntity<Page<LeaveRequestResponse>> getByUser(@PathVariable String employeeCode,
-                                                                @RequestParam(defaultValue = "0") int page,
-                                                                @RequestParam(defaultValue = "20") int size,
-                                                                @RequestParam(defaultValue = "createdDate,desc") String sort
+    // Lấy list leave request cho chính employee xem
+    @GetMapping("/myrequest")
+    public ResponseEntity<Page<LeaveRequestResponse>> getMyLeaveRequests(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdDate,desc") String sort
     ) {
         Pageable pageable = toPageable(page, size, sort);
-        Page<LeaveRequestResponse> result = leaveRequestService.findByUser_Id(employeeCode, pageable);
+        Page<LeaveRequestResponse> result = leaveRequestService.getMyLeaveRequests(pageable);
         return ResponseEntity.ok(result);
     }
 
@@ -103,6 +104,12 @@ public class LeaveRequestController {
         return ResponseEntity.ok(response);
     }
 
+
+    // Số ngày nghỉ còn lại của employee xem
+    @GetMapping("/remainingLeave")
+    public ResponseEntity<Double> getMyAnnualRemainingLeave() {
+        return ResponseEntity.ok(leaveRequestService.getMyAnnualRemainingLeave());
+    }
 
 
     @GetMapping("/status")
