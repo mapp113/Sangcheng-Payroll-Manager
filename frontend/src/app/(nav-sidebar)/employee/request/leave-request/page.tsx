@@ -1,9 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RequestLeaveData } from "@/app/_components/employee/request/leave/types";
 import LeavesToolBar from "@/app/_components/leaves/tool-bar";
 import { dateSlashToHyphen } from "@/app/_components/utils/dateSlashToHyphen";
+
+interface LeaveTypeOption {
+  code: string;
+  name: string;
+}
 
 export default function LeavesPage() {
   const [formData, setFormData] = useState<RequestLeaveData>({
@@ -16,6 +21,30 @@ export default function LeavesPage() {
     reason: "",
     attachment: null,
   });
+  const [leaveTypeOptions, setLeaveTypeOptions] = useState<LeaveTypeOption[]>([]);
+
+  useEffect(() => {
+    async function fetchLeaveTypeOptions() {
+      try {
+        const token = sessionStorage.getItem("scpm.auth.token");
+        const response = await fetch("http://localhost:8080/api/leave/options", {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setLeaveTypeOptions(data);
+        }
+      } catch (error) {
+        console.error("Error fetching leave type options:", error);
+      }
+    }
+
+    fetchLeaveTypeOptions();
+  }, []);
 
   const handleSelectChange = (id: string, value: string | boolean) => {
     setFormData((prev) => ({
@@ -98,8 +127,11 @@ export default function LeavesPage() {
             value={formData.leaveType}
             onChange={(e) => handleSelectChange("leaveType", e.target.value)}
           >
-            <option value="annual">Nghỉ hằng năm</option>
-            <option value="other">Khác</option>
+            {leaveTypeOptions.map((option) => (
+              <option key={option.code} value={option.code}>
+                {option.name}
+              </option>
+            ))}
           </select>
         </div>
         <div className="my-2">
