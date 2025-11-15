@@ -4,23 +4,33 @@ package com.g98.sangchengpayrollmanager.model.dto.OT;
 import com.g98.sangchengpayrollmanager.model.enums.LeaveandOTStatus;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Setter
 @Getter
-@ToString
-@AllArgsConstructor
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class OvertimeRequestResponse {
+
     private Integer id;
     private String employeeCode;
     private String fullName;
-    private LocalDateTime startDate;
+
+    private LocalDate otDate;
     private LocalDateTime fromTime;
     private LocalDateTime toTime;
     private Integer workedTime;
+
     private String reason;
+
+
+    // thêm 2 cái dưới để xác đinh dạng ngày
+    private Integer dayTypeId;
+    private String dayTypeName;
+
+
     private LeaveandOTStatus status;
     private LocalDateTime createdDateOT;
     private LocalDateTime approvedDateOT;

@@ -2,6 +2,8 @@ package com.g98.sangchengpayrollmanager.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,7 +21,7 @@ public class OvertimeRequest {
 
 
     @Column(name = "ot_date", nullable = false)
-    private LocalDateTime otDate;
+    private LocalDate otDate;
 
     @Column(name = "from_time")
     private LocalDateTime fromTime;
@@ -36,6 +38,10 @@ public class OvertimeRequest {
 
     @Column(length = 500)
     private String reason;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "day_type_id", nullable = false)
+    private DayType dayType;
 
     @Column(length = 10)
     private String status;

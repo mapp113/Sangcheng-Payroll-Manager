@@ -2,12 +2,9 @@ package com.g98.sangchengpayrollmanager.service.impl;
 
 import com.g98.sangchengpayrollmanager.model.dto.OT.OvertimeRequestResponse;
 import com.g98.sangchengpayrollmanager.model.dto.OvertimeRequestCreateDTO;
-import com.g98.sangchengpayrollmanager.model.entity.LeaveType;
-import com.g98.sangchengpayrollmanager.model.entity.OvertimeRequest;
-import com.g98.sangchengpayrollmanager.model.entity.User;
+import com.g98.sangchengpayrollmanager.model.entity.*;
 import com.g98.sangchengpayrollmanager.model.enums.LeaveandOTStatus;
-import com.g98.sangchengpayrollmanager.repository.OvertimeRequestRespository;
-import com.g98.sangchengpayrollmanager.repository.UserRepository;
+import com.g98.sangchengpayrollmanager.repository.*;
 import com.g98.sangchengpayrollmanager.service.OvertimeRequestService;
 import com.g98.sangchengpayrollmanager.service.validator.RequestValidator;
 import jakarta.transaction.Transactional;
@@ -18,10 +15,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.WeekFields;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,9 +31,11 @@ public class OvertimeRequestServiceImpl implements OvertimeRequestService {
 
 
     private final UserRepository userRepository;
-    private final OvertimeRequestRespository OvertimeRequestRespository;
     private final OvertimeRequestRespository overtimeRequestRespository;
     private final RequestValidator requestValidator;
+    private final DayTypeRepository dayTypeRepository;
+    private final SpecialDaysRepository specialDaysRepository;
+    private final OvertimeBalanceRepository overtimeBalanceRepository;
 
     @Override
     public OvertimeRequestResponse submitOvertimeRequest(OvertimeRequestCreateDTO overtimeRequestDTO) {
@@ -45,9 +47,44 @@ public class OvertimeRequestServiceImpl implements OvertimeRequestService {
 
         LocalDate otDate = requestValidator.validateOvertime(overtimeRequestDTO);
 
+        WeekFields wf = WeekFields.of(Locale.getDefault());
+//        int weekOfMonth = otDate.get(wf.weekOfMonth());
+//        int weekOfYear = otDate.get(wf.weekOfYear());
 
-        OvertimeRequest entity = mapToEntity(overtimeRequestDTO, user, otDate);
-       OvertimeRequest savedOvertimeRequest = OvertimeRequestRespository.save(entity);
+        DayType dayType = resolveDayType(otDate);
+
+        long workedHours = Duration.between(overtimeRequestDTO.getFromTime(),
+                                            overtimeRequestDTO.getToTime()).toHours();
+
+        LocalDate weekStart = otDate.with(java.time.DayOfWeek.MONDAY);
+        LocalDate weekEnd   = otDate.with(java.time.DayOfWeek.SUNDAY);
+
+
+        boolean hasOverlap = overtimeRequestRespository.existsOverlappingRequest(
+                user.getEmployeeCode(),
+                otDate,
+                overtimeRequestDTO.getFromTime(),
+                overtimeRequestDTO.getToTime());
+
+        if (hasOverlap) {
+            throw new IllegalArgumentException(
+                    "Khoảng thời gian OT này bị trùng với một đơn OT khác (đang chờ duyệt hoặc đã được duyệt) trong cùng ngày."
+            );
+        }
+
+        int weeklyHours = overtimeRequestRespository.sumWorkedHoursInWeek(
+                user.getEmployeeCode(), weekStart, weekEnd);
+
+        if(weeklyHours + workedHours > 10 ){
+            throw new IllegalArgumentException(  "Tổng số giờ OT trong tuần (bao gồm đơn này) không được vượt quá 10 giờ. "
+                                                  +"Hiện tại bạn đã đăng ký " + weeklyHours + " giờ trong tuần này.");
+        }
+
+        OvertimeRequest entity = mapToEntity(overtimeRequestDTO, user, otDate, dayType, (int) workedHours);
+       OvertimeRequest savedOvertimeRequest = overtimeRequestRespository.save(entity);
+
+        upsertOvertimeBalance(user, otDate, (int) workedHours, weeklyHours);
+
         return mapToResponse(savedOvertimeRequest);
     }
 
@@ -93,6 +130,50 @@ public class OvertimeRequestServiceImpl implements OvertimeRequestService {
     }
 
 
+    // tạo overtime_balance mới cho tuần đó
+    private void upsertOvertimeBalance(User user, LocalDate otDate, int workedHours, int weeklyHours) {
+        WeekFields wf = WeekFields.of(Locale.getDefault());
+        int weekOfMonth = otDate.get(wf.weekOfMonth());
+        int year  = otDate.getYear();
+        int month = otDate.getMonthValue();
+
+        OvertimeBalance balance = overtimeBalanceRepository.
+                                  findByUserEmployeeCodeAndYearAndMonthAndWeekOfMonth(
+                                          user.getEmployeeCode(), year, month, weekOfMonth )
+                .orElseGet(() -> OvertimeBalance.builder()
+                        .user(user)
+                        .year(year)
+                        .month(month)
+                        .weekOfMonth(weekOfMonth)
+                        .hourBalance(0)
+                        .build()
+                );
+        balance.setHourBalance(weeklyHours + workedHours);
+
+        overtimeBalanceRepository.save(balance);
+    }
+
+
+    // xác định dạng ngày ot
+    private DayType resolveDayType(LocalDate otDate) {
+
+        if (specialDaysRepository.existsByDate(otDate)) {
+            return dayTypeRepository.findByNameIgnoreCase("Holiday")
+                    .orElseThrow(() -> new IllegalArgumentException("khoong tìm thấy ngày lẽ "));
+        }
+
+        var dow = otDate.getDayOfWeek();
+        if (dow == DayOfWeek.SATURDAY || dow == DayOfWeek.SUNDAY) {
+            return dayTypeRepository.findByNameIgnoreCase("Weekend")
+                    .orElseThrow(() -> new IllegalArgumentException("khoong tìm thấy ngày "));
+        }
+
+        return dayTypeRepository.findByNameIgnoreCase("Working Day")
+                .orElseThrow(() -> new IllegalArgumentException("khoong tìm thấy ngày "));
+    }
+
+
+    // xác định ngươời gửi đơn
     public static String getCurrentUsername() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
@@ -102,17 +183,18 @@ public class OvertimeRequestServiceImpl implements OvertimeRequestService {
     }
 
 
-    private OvertimeRequest mapToEntity(OvertimeRequestCreateDTO overtimeRequestDTO, User user, LocalDate otDate) {
+
+    private OvertimeRequest mapToEntity(OvertimeRequestCreateDTO overtimeRequestDTO, User user, LocalDate otDate, DayType dayType, int workedHours) {
         LocalDateTime fromTime = overtimeRequestDTO.getFromTime();
         LocalDateTime toTime = overtimeRequestDTO.getToTime();
-        long workedHours = Duration.between(fromTime, toTime).toHours();
 
         return OvertimeRequest.builder()
-                .otDate(LocalDateTime.from(otDate))
+                .otDate(otDate)
                 .fromTime(fromTime)
                 .toTime(toTime)
-                .workedTime((int) workedHours)
+                .workedTime(workedHours)
                 .user(user)
+                .dayType(dayType)
                 .reason(overtimeRequestDTO.getReason())
                 .status(LeaveandOTStatus.PENDING.name())
                 .createdDateOT(LocalDateTime.now())
@@ -129,6 +211,8 @@ public class OvertimeRequestServiceImpl implements OvertimeRequestService {
                 .toTime(entity.getToTime())
                 .workedTime(entity.getWorkedTime())
                 .reason(entity.getReason())
+                .dayTypeId(entity.getDayType().getId())
+                .dayTypeName(entity.getDayType().getName())
                 .status(LeaveandOTStatus.valueOf(entity.getStatus()))
                 .createdDateOT(entity.getCreatedDateOT())
                 .approvedDateOT(entity.getApprovedDateOT())
