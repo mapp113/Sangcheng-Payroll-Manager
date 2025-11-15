@@ -61,8 +61,7 @@ public class RequestValidator {
     public LocalDate validateOvertime(OvertimeRequestCreateDTO overtimeRequestDTO) {
 
         LocalDate otDate = (overtimeRequestDTO.getOtDate() != null)
-                ? overtimeRequestDTO.getOtDate()
-                : LocalDate.now(); // default nếu null
+                ? overtimeRequestDTO.getOtDate() : LocalDate.now(); // default nếu null
 
         LocalDateTime fromTime = overtimeRequestDTO.getFromTime();
         LocalDateTime toTime = overtimeRequestDTO.getToTime();
