@@ -181,8 +181,8 @@ public class OvertimeRequestServiceImpl implements OvertimeRequestService {
     @Override
     public Page<OvertimeRequestResponse> searchOvertimeRequests(String keyword, Pageable pageable) {
 
-        keyword = keyword.toUpperCase();
         keyword = (keyword == null) ? "" : keyword.trim();
+        keyword = keyword.toUpperCase();
 
         Page<OvertimeRequest> pageResult = overtimeRequestRespository.searchByEmployeeCodeOrName(keyword, pageable);
         return pageResult.map(this::mapToResponse);
@@ -212,7 +212,7 @@ public class OvertimeRequestServiceImpl implements OvertimeRequestService {
         LocalDate weekEnd = today.with(java.time.DayOfWeek.SUNDAY);
 
         int weeklyHours = overtimeRequestRespository.sumWorkedHoursInWeek(
-                user.getUserId(), weekStart, weekEnd);
+                user.getEmployeeCode(), weekStart, weekEnd);
         int maxweeklyHouurs = 10;
         int remaining = maxweeklyHouurs - weeklyHours;
 
