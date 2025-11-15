@@ -299,6 +299,7 @@ public class OvertimeRequestServiceImpl implements OvertimeRequestService {
                 .id(entity.getId())
                 .employeeCode(entity.getUser().getEmployeeCode())
                 .fullName(entity.getUser().getFullName())
+                .otDate(entity.getOtDate())
                 .fromTime(entity.getFromTime())
                 .toTime(entity.getToTime())
                 .workedTime(entity.getWorkedTime())
