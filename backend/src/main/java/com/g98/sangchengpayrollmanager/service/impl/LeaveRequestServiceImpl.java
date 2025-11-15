@@ -43,6 +43,10 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
 
 
         LocalDate today = LocalDate.now();
+        LocalDate fromDate = leaveRequestDTO.getFromDate();
+        LocalDate toDate = (leaveRequestDTO.getToDate() != null) ? leaveRequestDTO.getToDate() : leaveRequestDTO.getFromDate();
+
+        leaveRequestDTO.setToDate(toDate);
 
         if (leaveRequestDTO.getFromDate().isBefore(today)) {
             throw new IllegalArgumentException("Ngày bắt đầu nghỉ phải từ hôm nay ");
@@ -53,13 +57,11 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         }
 
         User user = userRepository.findByUsernameWithRole(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+                .orElseThrow(() -> new RuntimeException("Không có người này: " + username));
 
         LeaveType leaveType = leaveTypeRepository.findByCode(leaveRequestDTO.getLeaveType())
-                .orElseThrow(() -> new RuntimeException("Leave type not found: " + leaveRequestDTO.getLeaveType()));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy ngày nghỉ: " + leaveRequestDTO.getLeaveType()));
 
-        LocalDate fromDate = leaveRequestDTO.getFromDate();
-        LocalDate toDate = (leaveRequestDTO.getToDate() != null) ? leaveRequestDTO.getToDate() : leaveRequestDTO.getFromDate();
 
         boolean overlap = LeaveRequestRepository.existsOverlappingLeave(
                 user.getEmployeeCode(), fromDate, toDate
@@ -110,9 +112,9 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
                long days = ChronoUnit.DAYS.between(fromDate, toDate) + 1;
                return (double) days;
            }
-           case HALF_DAY_AM, HALF_DAY_PM -> {
-               return (fromDate.toEpochDay() - toDate.toEpochDay()) / 2;
-           }
+//           case HALF_DAY_AM, HALF_DAY_PM -> {
+//               return (fromDate.toEpochDay() - toDate.toEpochDay()) / 2;
+//           }
            default -> throw new RuntimeException("Unsupported duration type: " + durationType);
        }
     }
@@ -136,7 +138,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         Double carried = quota.getCarriedOver() == null ? 0.0 : quota.getCarriedOver();
         Double used = quota.getUsedDays() == null ? 0.0 : quota.getUsedDays();
 
-        double remainingDays = Math.max((entitledDays+ carried)- used, 0.0);
+        double remainingDays = Math.max((entitledDays+ carried) - used, 0.0);
 
         return remainingDays;
 
@@ -236,7 +238,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     public LeaveRequestResponse approveLeaveRequest(Integer id, String note) {
 
         LeaveRequest leaveRequest = LeaveRequestRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Leave request not found"));
+                .orElseThrow(() -> new RuntimeException("Yêu cầu nghỉ ko tồn tại"));
 
 //        if (LeaveandOTStatus.APPROVED.name().equals(leaveRequest.getStatus())) {
 //            return mapToResponse(leaveRequest);

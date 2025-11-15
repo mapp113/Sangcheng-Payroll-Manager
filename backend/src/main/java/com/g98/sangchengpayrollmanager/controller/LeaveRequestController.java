@@ -43,8 +43,6 @@ public class LeaveRequestController {
     @PostMapping(value = "/submit", consumes = {"multipart/form-data"})
     public ResponseEntity<LeaveRequestResponse> submitLeaveRequest(@ModelAttribute  LeaveRequestCreateDTO requestDTO) {
 
-        validator.validateLeaveRequest(requestDTO);
-
         Integer id = leaveRequestService.submitLeaveRequest(requestDTO).getId();
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
@@ -143,6 +141,7 @@ public class LeaveRequestController {
 
 
 
+    // Chi tiết yêu cầu
         @GetMapping("/detail/{id}")
     public ResponseEntity<LeaveRequestResponse> getLeaveRequestDetail(@PathVariable Integer id) {
         LeaveRequestResponse response = leaveRequestService.getLeaveRequestDetail(id);
