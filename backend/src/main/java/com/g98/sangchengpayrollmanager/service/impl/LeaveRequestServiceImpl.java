@@ -202,8 +202,9 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
 
     @Override
     public Page<LeaveRequestResponse> searchLeaveRequests(String keyword, Pageable pageable) {
-        keyword = keyword.toUpperCase();
+
         keyword = (keyword == null) ? "" : keyword.trim();
+        keyword = keyword.toUpperCase();
 
         Page<LeaveRequest> pageResult =
                 LeaveRequestRepository.searchByEmployeeCodeOrName(keyword, pageable);
