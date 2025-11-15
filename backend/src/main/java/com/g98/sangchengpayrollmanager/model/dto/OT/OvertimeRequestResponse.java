@@ -16,9 +16,11 @@ public class OvertimeRequestResponse {
     private Integer id;
     private String employeeCode;
     private String fullName;
+    private LocalDateTime startDate;
     private LocalDateTime fromTime;
     private LocalDateTime toTime;
     private Integer workedTime;
+    private String reason;
     private LeaveandOTStatus status;
     private LocalDateTime createdDateOT;
     private LocalDateTime approvedDateOT;

@@ -17,6 +17,10 @@ public class OvertimeRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+
+    @Column(name = "ot_date", nullable = false)
+    private LocalDateTime otDate;
+
     @Column(name = "from_time")
     private LocalDateTime fromTime;
 
@@ -29,6 +33,9 @@ public class OvertimeRequest {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_code")
     private User user;
+
+    @Column(length = 500)
+    private String reason;
 
     @Column(length = 10)
     private String status;

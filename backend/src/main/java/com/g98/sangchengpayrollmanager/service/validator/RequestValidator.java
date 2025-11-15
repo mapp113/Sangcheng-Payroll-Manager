@@ -1,6 +1,7 @@
 package com.g98.sangchengpayrollmanager.service.validator;
 
 import com.g98.sangchengpayrollmanager.model.dto.LeaveRequestCreateDTO;
+import com.g98.sangchengpayrollmanager.model.dto.OvertimeRequestCreateDTO;
 import com.g98.sangchengpayrollmanager.model.entity.LeaveType;
 import com.g98.sangchengpayrollmanager.model.enums.DurationType;
 import com.g98.sangchengpayrollmanager.repository.LeaveTypeRepository;
@@ -8,12 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static io.micrometer.common.util.StringUtils.isBlank;
 
 @Component
 @RequiredArgsConstructor
-public class LeaveRequestValidator {
+public class RequestValidator {
 
     private final LeaveTypeRepository leaveTypeRepository;
 
@@ -34,6 +36,9 @@ public class LeaveRequestValidator {
             throw new IllegalArgumentException("reason tối đa 255 ký tự");
         }
         //  Parse enum duration + quy tắc theo duration
+        LocalDate from = dto.getFromDate();
+        LocalDate to = (dto.getToDate() != null) ? dto.getToDate() : from;
+        if (to.isBefore(from)) throw new IllegalArgumentException("toDate phải >= fromDate");
 
 //        if ((durationType == DurationType.HALF_DAY_AM || durationType == DurationType.HALF_DAY_PM)
 //                && !from.equals(to)) {
@@ -52,4 +57,31 @@ public class LeaveRequestValidator {
 
         return new ValidatedLeaveInputs(leaveType, durationType);
     }
+
+    public static LocalDate validateOvertime(OvertimeRequestCreateDTO overtimeRequestDTO) {
+
+        LocalDate otDate = (overtimeRequestDTO.getOtDate() != null)
+                ? overtimeRequestDTO.getOtDate()
+                : LocalDate.now(); // default nếu null
+
+        LocalDateTime fromTime = overtimeRequestDTO.getFromTime();
+        LocalDateTime toTime = overtimeRequestDTO.getToTime();
+
+        if (fromTime == null || toTime == null) {
+            throw new IllegalArgumentException("Thiếu thông tin ngày/giờ OT");
+        }
+
+        if (!fromTime.toLocalDate().equals(otDate) ||
+                !toTime.toLocalDate().equals(otDate)) {
+            throw new IllegalArgumentException("OT phải nằm trong cùng một ngày");
+        }
+
+        if (!toTime.isAfter(fromTime)) {
+            throw new IllegalArgumentException("Giờ kết thúc phải lớn hơn giờ bắt đầu");
+        }
+
+        return otDate;
+    }
 }
+
+

@@ -123,20 +123,20 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     @Override
     public double getMyAnnualRemainingLeave() {
 
-        String username = getCurrentUsername();
+            String username = getCurrentUsername();
 
-        User user  = userRepository.findByUsernameWithRole(username)
-                .orElseThrow(() -> new RuntimeException("người không tồn tại: " + username));
+            User user  = userRepository.findByUsernameWithRole(username)
+                    .orElseThrow(() -> new RuntimeException("người không tồn tại: " + username));
 
-        String  empCode = user.getEmployeeCode();
-        int year = LocalDate.now().getYear();
+            String  empCode = user.getEmployeeCode();
+            int year = LocalDate.now().getYear();
 
-        LeaveQuota quota = leaveQuotaRepository
-                .findByEmployeeCodeAndLeaveTypeCodeAndYear(empCode, ANNUAL_LEAVE_CODE, year)
-                .orElseThrow(() -> new RuntimeException("Chưa có quota thành viên này trong năm nay"));
-        Double entitledDays = quota.getEntitledDays();
-        Double carried = quota.getCarriedOver() == null ? 0.0 : quota.getCarriedOver();
-        Double used = quota.getUsedDays() == null ? 0.0 : quota.getUsedDays();
+            LeaveQuota quota = leaveQuotaRepository
+                    .findByEmployeeCodeAndLeaveTypeCodeAndYear(empCode, ANNUAL_LEAVE_CODE, year)
+                    .orElseThrow(() -> new RuntimeException("Chưa có quota thành viên này trong năm nay"));
+            Double entitledDays = quota.getEntitledDays();
+            Double carried = quota.getCarriedOver() == null ? 0.0 : quota.getCarriedOver();
+            Double used = quota.getUsedDays() == null ? 0.0 : quota.getUsedDays();
 
         double remainingDays = Math.max((entitledDays+ carried) - used, 0.0);
 

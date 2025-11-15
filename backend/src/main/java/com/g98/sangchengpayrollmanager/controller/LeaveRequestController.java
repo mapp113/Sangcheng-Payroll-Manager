@@ -5,11 +5,10 @@ import com.g98.sangchengpayrollmanager.model.dto.LeaveRequestCreateDTO;
 import com.g98.sangchengpayrollmanager.model.dto.LeaveTypeOptionDTO;
 import com.g98.sangchengpayrollmanager.model.dto.LeaveandOTRequestUpdateDTO;
 import com.g98.sangchengpayrollmanager.model.dto.leave.LeaveRequestResponse;
-import com.g98.sangchengpayrollmanager.model.entity.LeaveRequest;
 import com.g98.sangchengpayrollmanager.model.enums.LeaveandOTStatus;
 import com.g98.sangchengpayrollmanager.service.LeaveRequestService;
 import com.g98.sangchengpayrollmanager.service.LeaveTypeService;
-import com.g98.sangchengpayrollmanager.service.validator.LeaveRequestValidator;
+import com.g98.sangchengpayrollmanager.service.validator.RequestValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,7 +29,7 @@ import java.util.List;
 public class LeaveRequestController {
 
     private final LeaveRequestService leaveRequestService;
-    private final LeaveRequestValidator validator;
+    private final RequestValidator validator;
     private final LeaveTypeService leaveTypeService;
 
     @GetMapping("/options")
@@ -42,6 +41,8 @@ public class LeaveRequestController {
     // Submit request của employee
     @PostMapping(value = "/submit", consumes = {"multipart/form-data"})
     public ResponseEntity<LeaveRequestResponse> submitLeaveRequest(@ModelAttribute  LeaveRequestCreateDTO requestDTO) {
+
+        validator.validateLeaveRequest(requestDTO);
 
         Integer id = leaveRequestService.submitLeaveRequest(requestDTO).getId();
         URI location = ServletUriComponentsBuilder

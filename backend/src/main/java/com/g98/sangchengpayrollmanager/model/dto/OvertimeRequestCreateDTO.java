@@ -2,7 +2,10 @@ package com.g98.sangchengpayrollmanager.model.dto;
 
 
 import lombok.*;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -11,10 +14,21 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class OvertimeRequestCreateDTO {
-    private String employeeCode;
-    private LocalDateTime Date;
+
+
+    @NotNull
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate otDate;
+
+    @NotNull
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime fromTime;
+
+    @NotNull
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime toTime;
+
+
     private String reason;
 
 
