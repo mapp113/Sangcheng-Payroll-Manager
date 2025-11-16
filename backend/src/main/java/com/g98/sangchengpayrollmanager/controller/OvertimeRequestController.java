@@ -2,6 +2,7 @@ package com.g98.sangchengpayrollmanager.controller;
 
 import com.g98.sangchengpayrollmanager.model.dto.OT.OvertimeRequestResponse;
 import com.g98.sangchengpayrollmanager.model.dto.OvertimeRequestCreateDTO;
+import com.g98.sangchengpayrollmanager.model.dto.leave.LeaveRequestResponse;
 import com.g98.sangchengpayrollmanager.model.enums.LeaveandOTStatus;
 import com.g98.sangchengpayrollmanager.service.OvertimeRequestService;
 import lombok.RequiredArgsConstructor;
@@ -55,15 +56,25 @@ public class OvertimeRequestController {
 
     // Quản lý lấy tất cả các đơn
     @GetMapping("/all")
-    public ResponseEntity<Page<OvertimeRequestResponse>> getAllOvertime(
-            @RequestParam(required = false) Integer month,
-            @RequestParam(required = false) Integer year,
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "10") Integer size,
-            @RequestParam(defaultValue = "createdDateOT,DESC") String sort
+    public ResponseEntity<Page<OvertimeRequestResponse>> getAllOvertime( @RequestParam(required = false) String keyword,
+                                                                         @RequestParam(required = false) Integer month,
+                                                                         @RequestParam(required = false) Integer year,
+                                                                         @RequestParam(defaultValue = "0") Integer page,
+                                                                         @RequestParam(defaultValue = "10") Integer size,
+                                                                         @RequestParam(defaultValue = "createdDateOT,DESC") String sort
     ) {
         Pageable pageable = toPageable(page, size, sort);
-        return ResponseEntity.ok(overtimeRequestService.getAllOvertimeRequests(month, year, pageable));
+
+        Page<OvertimeRequestResponse> result;
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            result = overtimeRequestService.searchOvertimeRequests(keyword, pageable);
+        }
+        else {
+            result = overtimeRequestService.getAllOvertimeRequests(month, year, pageable);
+        }
+
+        return ResponseEntity.ok(result);
     }
 
     // Duyệt đơn xin overtime

@@ -26,10 +26,15 @@ import java.util.Optional;
 
     // tìm theo lịch
     @Query("""
-           SELECT o
+            SELECT o
            FROM OvertimeRequest o
            WHERE (:month IS NULL OR FUNCTION('month', o.otDate) = :month)
-             AND (:year  IS NULL OR FUNCTION('year', o.otDate) = :year)
+             AND (:year  IS NULL OR FUNCTION('year',  o.otDate) = :year)
+           ORDER BY
+               CASE
+                   WHEN o.status = 'PENDING' THEN 0 ELSE 1
+               END ASC,
+               o.createdDateOT DESC
            """)
     Page<OvertimeRequest> filterByMonthYear(@Param("month") Integer month,
                                             @Param("year") Integer year,

@@ -53,13 +53,12 @@ public class LeaveRequestController {
 
     // Lấy leave request cho anager xem
     @GetMapping("/all")
-    public ResponseEntity<Page<LeaveRequestResponse>> getAllOrSearch(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Integer month,
-            @RequestParam(required = false) Integer year,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "createdDate,desc") String sort
+    public ResponseEntity<Page<LeaveRequestResponse>> getAllOrSearch( @RequestParam(required = false) String keyword,
+                                                                      @RequestParam(required = false) Integer month,
+                                                                      @RequestParam(required = false) Integer year,
+                                                                      @RequestParam(defaultValue = "0") int page,
+                                                                      @RequestParam(defaultValue = "20") int size,
+                                                                      @RequestParam(defaultValue = "createdDate,desc") String sort
     ) {
         Pageable pageable = toPageable(page, size, sort);
 

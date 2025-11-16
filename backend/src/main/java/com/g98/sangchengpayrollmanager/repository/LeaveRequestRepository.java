@@ -38,13 +38,14 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Inte
     """)
     boolean existsOverlappingLeave(@Param("empCode") String employeeCode,
                                    @Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate);
-
-
     @Query("""
-       SELECT lr FROM LeaveRequest lr
-       WHERE (:month IS NULL OR MONTH(lr.createdDate) = :month)
-         AND (:year IS NULL OR YEAR(lr.createdDate) = :year)
-       """)
+    SELECT lr FROM LeaveRequest lr
+    WHERE (:month IS NULL OR MONTH(lr.createdDate) = :month)
+     AND (:year IS NULL OR YEAR(lr.createdDate) = :year)
+    ORDER BY 
+       CASE WHEN lr.status = 'PENDING' THEN 0 ELSE 1 END ASC,
+       lr.createdDate DESC
+   """)
     Page<LeaveRequest> filterByMonthYear(
             @Param("month") Integer month, @Param("year") Integer year, Pageable pageable);
 }
