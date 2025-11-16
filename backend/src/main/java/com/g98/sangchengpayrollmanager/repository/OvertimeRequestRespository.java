@@ -24,6 +24,7 @@ import java.util.Optional;
 
     Page<OvertimeRequest> findByUser_EmployeeCode(String employeeCode, Pageable pageable);
 
+    // tìm theo lịch
     @Query("""
            SELECT o
            FROM OvertimeRequest o
@@ -34,16 +35,18 @@ import java.util.Optional;
                                             @Param("year") Integer year,
                                             Pageable pageable);
 
+    // search
     @Query("""
-           SELECT o
-           FROM OvertimeRequest o
-           WHERE (:keyword IS NULL OR :keyword = '' 
-              OR LOWER(o.user.employeeCode) LIKE LOWER(CONCAT('%', :keyword, '%'))
-              OR LOWER(o.user.fullName)     LIKE LOWER(CONCAT('%', :keyword, '%')))
-           """)
-    Page<OvertimeRequest> searchByEmployeeCodeOrName(@Param("keyword") String keyword,
-                                                     Pageable pageable);
+    SELECT o FROM OvertimeRequest o
+    JOIN o.user u
+    WHERE LOWER(u.employeeCode) LIKE LOWER(CONCAT('%', :keyword, '%'))
+       OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    """)
+    Page<OvertimeRequest> searchByEmployeeCodeOrName(
+            @Param("keyword") String keyword, Pageable pageable);
 
+
+    //tinhs tổng số giờ trong tuần
     @Query("""
        SELECT COALESCE(SUM(o.workedTime), 0)
        FROM OvertimeRequest o
@@ -55,6 +58,8 @@ import java.util.Optional;
                              @Param("weekStart") LocalDate weekStart,
                              @Param("weekEnd") LocalDate weekEnd);
 
+
+    // đếm để tránh bị trunùng
     @Query("""
        SELECT COUNT(o) > 0
        FROM OvertimeRequest o

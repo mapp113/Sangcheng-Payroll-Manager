@@ -1,7 +1,8 @@
 package com.g98.sangchengpayrollmanager.model.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.antlr.v4.runtime.misc.NotNull;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,7 +28,7 @@ public class LeaveRequestCreateDTO {
     @NotNull
     private String duration;
 
-    @NotNull
+
     private String reason;
 
     private MultipartFile attachment;
