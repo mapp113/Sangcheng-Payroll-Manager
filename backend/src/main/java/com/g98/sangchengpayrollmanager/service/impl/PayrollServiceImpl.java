@@ -71,6 +71,9 @@ public class PayrollServiceImpl implements PayrollService {
 
         // 5. gross_income
         int grossIncome = baseSalaryAmount + otAmount + totalAddition;
+        System.out.println("baseSalaryAmount: " + baseSalaryAmount);
+        System.out.println("otAmount: " + otAmount);
+        System.out.println("totalAddition: " + totalAddition);
 
         // 6.BHXH,BHYT,BHTN
         // lương tính bảo hiểm =  Lương cơ bản + insuredBaseExtra

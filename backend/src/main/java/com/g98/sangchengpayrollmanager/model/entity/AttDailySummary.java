@@ -22,7 +22,7 @@ public class AttDailySummary {
     @JoinColumn(name = "employee_code", nullable = false)
     private User user;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private LocalDate date;
 
     @Column(name = "work_hours", nullable = false)
@@ -47,10 +47,28 @@ public class AttDailySummary {
     @JoinColumn(name = "day_type_id")
     private DayType dayType;
 
-    @Column(name = "check_in_time", nullable = false)
+    @Column(name = "check_in_time")
     private LocalDateTime checkInTime;
 
     @Column(name = "check_out_time")
     private LocalDateTime checkOutTime;
+
+    @Column(name = "late_minutes")
+    private Integer lateMinutes;
+
+    @Column(name = "is_late_counted", nullable = false)
+    private Boolean isLateCounted;
+
+    @Column(name = "early_leave_minutes")
+    private Integer earlyLeaveMinutes;
+
+    @Column(name = "is_early_leave_counted", nullable = false)
+    private Boolean isEarlyLeaveCounted;
+
+    @Column(name = "leave_type_code")
+    private String leaveTypeCode;
+
+    @Column(name = "is_absent")
+    private Boolean isAbsent;
 }
 

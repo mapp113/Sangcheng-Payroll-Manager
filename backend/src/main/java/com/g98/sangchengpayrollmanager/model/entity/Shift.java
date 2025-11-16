@@ -32,5 +32,8 @@ public class Shift {
 
     @Column(name = "is_ot")
     private Boolean isOt;
+
+    @Column(name = "break_minutes", nullable = false)
+    private Integer breakMinutes;
 }
 
