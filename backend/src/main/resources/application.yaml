@@ -3,7 +3,7 @@ spring:
     name: Sangcheng Payroll Manager
 
   datasource:
-    url: jdbc:mysql://localhost:3306/hrm?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/hrm?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Ho_Chi_Minh
     username: root
     password: 123456
 

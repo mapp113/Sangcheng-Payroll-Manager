@@ -6,7 +6,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-
 public interface DayTypeRepository extends JpaRepository<DayType, Integer> {
     Optional<DayType> findByNameIgnoreCase(String name);
+
+    Optional<DayType> findByName(String name);
 }

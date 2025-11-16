@@ -4,6 +4,7 @@ import com.g98.sangchengpayrollmanager.model.dto.attendant.response.TimeSheetRes
 import com.g98.sangchengpayrollmanager.model.dto.payroll.response.PaySummaryResponse;
 import com.g98.sangchengpayrollmanager.model.entity.AttMonthSummary;
 import com.g98.sangchengpayrollmanager.model.entity.PaySummary;
+import com.g98.sangchengpayrollmanager.model.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,10 +12,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 public interface AttMonthSummaryRepository extends JpaRepository<AttMonthSummary,Integer> {
     AttMonthSummary findByUserEmployeeCodeAndMonth(String employeeCode, LocalDate month);
-
+    Optional<AttMonthSummary> findByUserAndMonth(User user, LocalDate month);
     @Query(
             value = """
             Select new com.g98.sangchengpayrollmanager.model.dto.attendant.response.TimeSheetResponse(
@@ -22,7 +24,8 @@ public interface AttMonthSummaryRepository extends JpaRepository<AttMonthSummary
                 ams.user.fullName,
                 ei.position.name,
                 ams.daysHours,
-                ams.otHours
+                ams.otHours,
+                ams.usedleave
             )
             FROM AttMonthSummary ams ,EmployeeInformation ei 
             WHERE ams.user.employeeCode = ei.user.employeeCode

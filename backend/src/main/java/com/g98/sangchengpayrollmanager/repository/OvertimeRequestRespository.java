@@ -5,6 +5,7 @@ import com.g98.sangchengpayrollmanager.model.dto.OT.OvertimeRequestResponse;
 import com.g98.sangchengpayrollmanager.model.entity.OvertimeRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import com.g98.sangchengpayrollmanager.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,7 +19,20 @@ import java.util.Optional;
 @Repository
     public interface OvertimeRequestRespository extends JpaRepository<OvertimeRequest, Integer> {
 
-    Optional<OvertimeRequestResponse> findOvertimeRequestById(Integer overtimeRequestId);
+        Optional<OvertimeRequestResponse> findOvertimeRequestById(Integer overtimeRequestId);
+        List<OvertimeRequest> findByStatus(String status);
+
+    @Query("""
+        SELECT ot FROM OvertimeRequest ot
+        WHERE ot.user = :user
+          AND ot.status = :status
+          AND DATE(ot.fromTime) = :date
+    """)
+    List<OvertimeRequest> findByUserAndDateAndStatus(
+            @Param("user") User user,
+            @Param("date") LocalDate date,
+            @Param("status") String status
+    );
 
     Page<OvertimeRequest> findByStatus(String status, Pageable pageable);
 
@@ -81,4 +95,3 @@ import java.util.Optional;
 
     Integer id(Integer id);
 }
-

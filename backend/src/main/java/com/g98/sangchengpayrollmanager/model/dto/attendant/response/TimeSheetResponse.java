@@ -5,6 +5,7 @@ public record TimeSheetResponse(
     String fullName,
     String positionName,
     Integer daysHours,
-    Integer otHours
+    Integer otHours,
+    Integer usedleave
 ) {
 }
