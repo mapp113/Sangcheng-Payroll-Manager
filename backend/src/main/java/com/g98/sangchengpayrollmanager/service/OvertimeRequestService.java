@@ -36,7 +36,7 @@ public interface OvertimeRequestService {
     Page<OvertimeRequestResponse> findByStatus(LeaveandOTStatus status, Pageable pageable);
 
     // Tính số OT còn lại trong tuần
-    Integer getMyRemainingWeeklyOvertime();
+    Integer getMyRemainingMonthlyOvertime();
 
 
 }

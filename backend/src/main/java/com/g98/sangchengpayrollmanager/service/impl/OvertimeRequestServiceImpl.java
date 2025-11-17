@@ -34,6 +34,8 @@ public class OvertimeRequestServiceImpl implements OvertimeRequestService {
     private final DayTypeRepository dayTypeRepository;
     private final SpecialDaysRepository specialDaysRepository;
     private final OvertimeBalanceRepository overtimeBalanceRepository;
+    private final LeaveTypeRepository leaveTypeRepository;
+    private final LeaveQuotaRepository leaveQuotaRepository;
 
     @Override
     public OvertimeRequestResponse submitOvertimeRequest(OvertimeRequestCreateDTO overtimeRequestDTO) {
@@ -54,8 +56,8 @@ public class OvertimeRequestServiceImpl implements OvertimeRequestService {
         long workedHours = Duration.between(overtimeRequestDTO.getFromTime(),
                                             overtimeRequestDTO.getToTime()).toHours();
 
-        LocalDate weekStart = otDate.with(java.time.DayOfWeek.MONDAY);
-        LocalDate weekEnd   = otDate.with(java.time.DayOfWeek.SUNDAY);
+        LocalDate monthStart = LocalDate.of(otDate.getYear(), otDate.getMonth(), 1);
+        LocalDate monthEnd   = otDate.withDayOfMonth(otDate.lengthOfMonth());
 
 
         boolean hasOverlap = overtimeRequestRespository.existsOverlappingRequest(
@@ -70,12 +72,14 @@ public class OvertimeRequestServiceImpl implements OvertimeRequestService {
             );
         }
 
-        int weeklyHours = overtimeRequestRespository.sumWorkedHoursInWeek(
-                user.getEmployeeCode(), weekStart, weekEnd);
+        int monthlyHours = overtimeRequestRespository.sumWorkedHoursInMonth(
+                user.getEmployeeCode(), monthStart, monthEnd);
 
-        if(weeklyHours + workedHours > 10 ){
+        if(monthlyHours + workedHours > 40 ){
             throw new IllegalArgumentException(  "Tổng số giờ OT trong tuần (bao gồm đơn này) không được vượt quá 10 giờ. "
-                                                  +"Hiện tại bạn đã đăng ký " + weeklyHours + " giờ trong tuần này.");
+                                                  +"Hiện tại bạn đã đăng ký " + monthlyHours + " giờ trong tuần này.");
+
+
         }
 
         OvertimeRequest entity = mapToEntity(overtimeRequestDTO, user, otDate, dayType, (int) workedHours);
@@ -200,7 +204,7 @@ public class OvertimeRequestServiceImpl implements OvertimeRequestService {
 
     // Tính thời gian còn lại
     @Override
-    public Integer getMyRemainingWeeklyOvertime(){
+    public Integer getMyRemainingMonthlyOvertime() {
         String username = getCurrentUsername();
 
         User user = userRepository.findByUsernameWithRole(username)
@@ -208,16 +212,72 @@ public class OvertimeRequestServiceImpl implements OvertimeRequestService {
 
         LocalDate today = LocalDate.now();
 
-        LocalDate weekStart = today.with(java.time.DayOfWeek.MONDAY);
-        LocalDate weekEnd = today.with(java.time.DayOfWeek.SUNDAY);
+        LocalDate monthStart = today.withDayOfMonth(1);
+        LocalDate monthEnd   = today.withDayOfMonth(today.lengthOfMonth());
 
-        int weeklyHours = overtimeRequestRespository.sumWorkedHoursInWeek(
-                user.getEmployeeCode(), weekStart, weekEnd);
-        int maxweeklyHouurs = 10;
-        int remaining = maxweeklyHouurs - weeklyHours;
+        int monthlyHours = overtimeRequestRespository.sumWorkedHoursInMonth(
+                user.getEmployeeCode(), monthStart, monthEnd
+        );
+
+        int maxMonthlyHours = 40;
+        int remaining = maxMonthlyHours - monthlyHours;
 
         return Math.max(0, remaining);
     }
+
+    private void changeOvertimetoLeaveWithMonthlyOverLimit(User user, LocalDate otDate) {
+        String username = getCurrentUsername();
+        int year = otDate.getYear();
+        int month = otDate.getMonthValue();
+
+        LocalDate monthStart = LocalDate.of(year, month, 1);
+        LocalDate monthEnd = otDate.withDayOfMonth(otDate.lengthOfMonth());
+
+        int monthlyHours = overtimeRequestRespository.sumWorkedHoursInMonth(username, monthStart, monthEnd);
+
+        int limit = 40;
+        int excessHours = monthlyHours - limit;
+
+        if (excessHours <= 0) {
+            return;
+        }
+
+        double extraDays = excessHours / 8.0;
+        if (extraDays <= 0.0) {
+            return;
+        }
+
+        LeaveType compType = leaveTypeRepository.findByCode("OT_COMP")
+                .orElseGet(() -> {
+                    LeaveType leaveType = new LeaveType();
+                    leaveType.setCode("OT_COMP");
+                    leaveType.setName("Nghỉ bù OT ");
+                    leaveType.setIsCountedAsLeave(true);
+                    leaveType.setIsPaid(true);
+                    leaveType.setNote(" OT vượt quá 40h/ tháng tự động tạo");
+                    return leaveTypeRepository.save(leaveType);
+                });
+
+
+        LeaveQuota quota = leaveQuotaRepository.findByEmployeeCodeAndLeaveTypeCodeAndYear(username, compType.getCode(), year)
+                .orElseGet(() -> {
+                    LeaveQuota q = new LeaveQuota();
+                    q.setEmployeeCode(username);
+                    q.setLeaveTypeCode("OT_COMP");
+                    q.setLeaveType(compType);
+                    q.setYear(LocalDate.now().getYear());
+                    q.setEntitledDays(0.0);
+                    q.setCarriedOver(0.0);
+                    q.setUsedDays(0.0);
+                    return q;
+                });
+        double currentEntitledDays = quota.getEntitledDays() == null ? 0 :quota.getEntitledDays();
+        quota.setEntitledDays(currentEntitledDays + extraDays);
+
+        leaveQuotaRepository.save(quota);
+    }
+
+
 
 
     // tạo overtime_balance mới cho tuần đó

@@ -65,17 +65,18 @@ import java.util.Optional;
             @Param("keyword") String keyword, Pageable pageable);
 
 
-    //tinhs tổng số giờ trong tuần
+    //tinhs tổng số giờ trong tháng
     @Query("""
-       SELECT COALESCE(SUM(o.workedTime), 0)
-       FROM OvertimeRequest o
-       WHERE o.user.employeeCode = :empCode
-         AND o.otDate BETWEEN :weekStart AND :weekEnd
-         AND o.status IN ('PENDING', 'APPROVED')
-       """)
-    int sumWorkedHoursInWeek(@Param("empCode") String empCode,
-                             @Param("weekStart") LocalDate weekStart,
-                             @Param("weekEnd") LocalDate weekEnd);
+    SELECT COALESCE(SUM(o.workedTime), 0)
+    FROM OvertimeRequest o
+    WHERE o.user.employeeCode = :empCode
+      AND o.otDate BETWEEN :monthStart AND :monthEnd
+      AND o.status IN ('PENDING', 'APPROVED')
+   """)
+    int sumWorkedHoursInMonth(@Param("empCode") String empCode,
+                              @Param("monthStart") LocalDate monthStart,
+                              @Param("monthEnd") LocalDate monthEnd);
+
 
 
     // đếm để tránh bị trunùng
