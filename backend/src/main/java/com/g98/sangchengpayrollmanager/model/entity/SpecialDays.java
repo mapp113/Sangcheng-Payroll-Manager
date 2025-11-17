@@ -25,4 +25,8 @@ public class SpecialDays {
 
     @Column(name = "date", nullable = false)
     private LocalDate date;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "day_type_id", nullable = false)
+    private DayType dayType;
 }

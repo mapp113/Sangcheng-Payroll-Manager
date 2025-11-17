@@ -22,7 +22,7 @@ export default function NavigationSidebar({ select }: { select: number }) {
           </a>
         </li>
         <li className={`${select === 4 ? selected : ""}`}>
-          <a href="/request" className="hover:underline ">
+          <a href="/employee/request" className="hover:underline ">
             <Image src="/icons/employee/request.png" alt="Request" width={52} height={52} />
           </a>
         </li>

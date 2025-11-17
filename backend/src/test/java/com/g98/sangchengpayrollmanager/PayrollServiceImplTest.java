@@ -2,6 +2,8 @@ package com.g98.sangchengpayrollmanager;
 
 import com.g98.sangchengpayrollmanager.model.entity.SalaryInformation;
 import com.g98.sangchengpayrollmanager.repository.SalaryInformationRepository;
+import com.g98.sangchengpayrollmanager.service.AttDailySummaryService;
+import com.g98.sangchengpayrollmanager.service.AttMonthSummaryService;
 import com.g98.sangchengpayrollmanager.service.impl.PayrollServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,24 +17,83 @@ class PayrollServiceImplTest {
 
     @Autowired
     private PayrollServiceImpl payrollService;
+    //private AttMonthSummaryService attMonthSummaryService;
+
+
+    //private AttDailySummaryService attDailySummaryService;
     //SalaryInformationRepository salaryInformationRepository;
 
     @Test
     void testCalculateMonthlySalary() {
-        payrollService.calculateMonthlySalary(
+//        payrollService.calculateMonthlySalary(
+//                "EMP010",
+//                LocalDate.of(2023, 8, 1),   // tháng tính lương để lấy monthSumary
+//                LocalDate.of(2023, 8, 1), //monthStart
+//                LocalDate.of(2023, 8, 31)  //monthEnd
+//        );
+//        attMonthSummaryService.createMonthSummary("EMP010", LocalDate.of(2023, 8, 31));
+
+                payrollService.calculateMonthlySalary(
                 "EMP001",
-                LocalDate.of(2025, 10, 1),   // tháng tính lương để lấy monthSumary
-                LocalDate.of(2025, 9, 15), //monthStart
-                LocalDate.of(2025, 10, 15)  //monthEnd
+                LocalDate.of(2025, 9, 1),   // tháng tính lương để lấy monthSumary
+                LocalDate.of(2025, 9, 1), //monthStart
+                LocalDate.of(2025, 9, 30)  //monthEnd
+        );
+        payrollService.calculateMonthlySalary(
+                "EMP002",
+                LocalDate.of(2025, 9, 1),   // tháng tính lương để lấy monthSumary
+                LocalDate.of(2025, 9, 1), //monthStart
+                LocalDate.of(2025, 9, 30)  //monthEnd
+        );
+        payrollService.calculateMonthlySalary(
+                "EMP003",
+                LocalDate.of(2025, 9, 1),   // tháng tính lương để lấy monthSumary
+                LocalDate.of(2025, 9, 1), //monthStart
+                LocalDate.of(2025, 9, 30)  //monthEnd
+        );
+        payrollService.calculateMonthlySalary(
+                "EMP004",
+                LocalDate.of(2025, 9, 1),   // tháng tính lương để lấy monthSumary
+                LocalDate.of(2025, 9, 1), //monthStart
+                LocalDate.of(2025, 9, 30)  //monthEnd
+        );
+        payrollService.calculateMonthlySalary(
+                "EMP005",
+                LocalDate.of(2025, 9, 1),   // tháng tính lương để lấy monthSumary
+                LocalDate.of(2025, 9, 1), //monthStart
+                LocalDate.of(2025, 9, 30)  //monthEnd
+        );
+        payrollService.calculateMonthlySalary(
+                "EMP006",
+                LocalDate.of(2025, 9, 1),   // tháng tính lương để lấy monthSumary
+                LocalDate.of(2025, 9, 1), //monthStart
+                LocalDate.of(2025, 9, 30)  //monthEnd
+        );
+        payrollService.calculateMonthlySalary(
+                "EMP007",
+                LocalDate.of(2025, 9, 1),   // tháng tính lương để lấy monthSumary
+                LocalDate.of(2025, 9, 1), //monthStart
+                LocalDate.of(2025, 9, 30)  //monthEnd
+        );
+        payrollService.calculateMonthlySalary(
+                "EMP008",
+                LocalDate.of(2025, 9, 1),   // tháng tính lương để lấy monthSumary
+                LocalDate.of(2025, 9, 1), //monthStart
+                LocalDate.of(2025, 9, 30)  //monthEnd
+        );
+        payrollService.calculateMonthlySalary(
+                "EMP009",
+                LocalDate.of(2025, 9, 1),   // tháng tính lương để lấy monthSumary
+                LocalDate.of(2025, 9, 1), //monthStart
+                LocalDate.of(2025, 9, 30)  //monthEnd
         );
 
 
 
-//        List<SalaryInformation> salaryInformations = salaryInformationRepository.findActiveByEmployeeCode("EMP001", LocalDate.of(2025, 9, 15), LocalDate.of(2025, 10, 31));
-//        System.out.println("Số bản ghi tìm thấy: " + salaryInformations.size());
-//        for (SalaryInformation s : salaryInformations) {
-//            System.out.println(s);
-//        }
+
+
+//          attDailySummaryService.createDailySummary("EMP001", LocalDate.of(2025, 11, 16));
+
     }
 }
 

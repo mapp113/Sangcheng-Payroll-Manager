@@ -48,5 +48,11 @@ public class AttMonthSummary {
 
     @Column(name = "standard_hours_per_day", precision = 4, scale = 2, nullable = false)
     private BigDecimal standardHoursPerDay;
+
+    @Column(name = "late_count", nullable = false)
+    private Integer lateCount;
+
+    @Column(name = "early_leave_count", nullable = false)
+    private Integer earlyLeaveCount;
 }
 

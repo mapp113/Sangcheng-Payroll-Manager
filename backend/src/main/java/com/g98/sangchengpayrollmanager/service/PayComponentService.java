@@ -151,11 +151,10 @@ public class PayComponentService {
             // Lấy policy GROUP (cap/tỷ lệ nhóm)
             // lấy ra policy loại group với effective_from <= periodEnd <= effective_to của policy
             LegalPolicy groupPolicy = legalPolicyRepository.findActiveByCode(groupPolicyCode, periodEnd); //
-            System.out.println("groupPolicy = " + groupPolicy.getCode());
             if (groupPolicy == null) {
                 continue;
             }
-
+            //System.out.println("groupPolicy = " + groupPolicy.getCode());
             String calculationType = groupPolicy.getCalculationType();
             CalculationType calculationTypeCheck = CalculationType.fromString(calculationType);
             if (calculationTypeCheck == null

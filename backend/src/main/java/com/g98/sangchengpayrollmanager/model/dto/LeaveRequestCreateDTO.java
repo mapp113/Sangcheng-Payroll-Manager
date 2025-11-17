@@ -1,9 +1,10 @@
 package com.g98.sangchengpayrollmanager.model.dto;
 
-import com.g98.sangchengpayrollmanager.model.entity.LeaveType;
-import com.g98.sangchengpayrollmanager.model.enums.DurationType;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.antlr.v4.runtime.misc.NotNull;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
@@ -12,13 +13,14 @@ import java.time.LocalDate;
 
 public class LeaveRequestCreateDTO {
 
-    private String employeeCode;
    // private String fullName;
 
     @NotNull
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate fromDate;
 
     @NotNull
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate toDate;
 
     private String leaveType;
@@ -26,11 +28,10 @@ public class LeaveRequestCreateDTO {
     @NotNull
     private String duration;
 
-    private Boolean isPaidLeave;
-    @NotNull
+
     private String reason;
 
-    private String file;
+    private MultipartFile attachment;
 
 
 }

@@ -55,8 +55,8 @@ public class LeaveRequest {
     @Column(name = "note", length = 500)
     private String note;
 
-    @Column(name = "link_url", length = 500)
-    private String linkUrl;
+    @Column(name = "attachment_path", length = 500)
+    private String attachmentPath;
 
     @Column(name = "is_paid_leave", nullable = false)
     private Boolean isPaidLeave ;

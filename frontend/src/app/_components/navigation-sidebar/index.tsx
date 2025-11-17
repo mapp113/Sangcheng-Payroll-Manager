@@ -10,9 +10,6 @@ export default function NavigationSidebar({select}: { select: number }) {
                     <a href="/employees" className="hover:underline">
                         <Image src="/icons/employee.png" alt="Employees" width={52} height={52}/>
                     </a>
-                    <a href="/admin" className="hover:underline">
-                        <Image src="/icons/employee.png" alt="Admin" width={52} height={52}/>
-                    </a>
                 </li>
                 <li className={`${select === 2 ? selected : ""}`}>
                     <a href="/attendance" className="hover:underline">
@@ -32,6 +29,16 @@ export default function NavigationSidebar({select}: { select: number }) {
                 <li className={`${select === 5 ? selected : ""}`}>
                     <a href="/reports" className="hover:underline">
                         <Image src="/icons/report.png" alt="Reports" width={52} height={52}/>
+                    </a>
+                </li>
+                <li className={`${select === 6 ? selected : ""}`}>
+                    <a href="/manager/requests/leaves" className="hover:underline">
+                        <Image src="/icons/leave-request.png" alt="Leave Request" width={52} height={52}/>
+                    </a>
+                </li>
+                <li className={`${select === 7 ? selected : ""}`}>
+                    <a href="/manager/requests/overtime" className="hover:underline">
+                        <Image src="/icons/overtime-request.png" alt="Overtime Request" width={52} height={52}/>
                     </a>
                 </li>
             </ul>

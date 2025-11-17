@@ -20,7 +20,15 @@ public class OvertimeBalance {
     @JoinColumn(name = "employee_code", nullable = false)
     private User user;
 
+    @Column(name = "year", nullable = false)
+    private Integer year;
+
+    @Column(name = "month", nullable = false)
+    private Integer month;
+
+    @Column(name = "week_of_month", nullable = false)
+    private Integer weekOfMonth;
+
     @Column(name = "hour_balance")
     private Integer hourBalance;
 }
-
