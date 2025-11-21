@@ -3,6 +3,8 @@
 import LeavesToolBar from "@/app/_components/leaves/tool-bar";
 import { dateSlashToHyphen } from "@/app/_components/utils/dateSlashToHyphen";
 import { useState } from "react";
+import { NotificationProvider, useNotification } from "@/app/_components/common/pop-box/notification/notification-context";
+import BottomRightNotification from "@/app/_components/common/pop-box/notification/bottom-right";
 
 interface OTRequestData {
   otDate: string;
@@ -12,7 +14,8 @@ interface OTRequestData {
   reason: string;
 }
 
-export default function OTRequestsPage() {
+function OTRequestsPageContent() {
+  const { addNotification } = useNotification();
   const [formData, setFormData] = useState<OTRequestData>({
     otDate: "",
     fromTime: 0,
@@ -57,13 +60,13 @@ export default function OTRequestsPage() {
   const handleSubmit = async () => {
     // Validate required fields
     if (!formData.otDate || formData.fromTime === undefined || formData.toTime === undefined) {
-      alert("Vui lòng điền đầy đủ thông tin ngày làm thêm và thời gian");
+      addNotification("error", "Lỗi", "Vui lòng điền đầy đủ thông tin ngày làm thêm và thời gian", 4000);
       return;
     }
 
     // Validate fromTime < toTime
     if (formData.fromTime >= formData.toTime) {
-      alert("Giờ bắt đầu phải nhỏ hơn giờ kết thúc");
+      addNotification("error", "Lỗi", "Giờ bắt đầu phải nhỏ hơn giờ kết thúc", 4000);
       return;
     }
 
@@ -95,7 +98,7 @@ export default function OTRequestsPage() {
       });
 
       if (response.ok) {
-        alert("Gửi yêu cầu OT thành công");
+        addNotification("ok", "Thành công", "Gửi yêu cầu OT thành công", 3000);
         handleReset();
       } else {
         const errorText = await response.text();
@@ -103,7 +106,8 @@ export default function OTRequestsPage() {
       }
     } catch (error) {
       console.error("Lỗi khi gửi yêu cầu OT:", error);
-      alert("Gửi yêu cầu OT thất bại"+ (error instanceof Error ? `: ${error.message}` : ""));
+      const errorMessage = error instanceof Error ? error.message : "Lỗi không xác định";
+      addNotification("error", "Lỗi", `Gửi yêu cầu OT thất bại: ${errorMessage}`, 5000);
     }
   };
 
@@ -201,5 +205,14 @@ export default function OTRequestsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function OTRequestsPage() {
+  return (
+    <NotificationProvider>
+      <OTRequestsPageContent />
+      <BottomRightNotification />
+    </NotificationProvider>
   );
 }
