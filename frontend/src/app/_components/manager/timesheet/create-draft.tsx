@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { CreateDraftParamContext, ParamsContext } from "./timesheet-context";
 import { TimesheetQuery } from "./query";
-import type { TimesheetRecord } from "./type";
+import type { CreateDraftParams, TimesheetRecord } from "./type";
 
 export default function CreateDraft() {
   const context = useContext(CreateDraftParamContext);
@@ -165,3 +165,36 @@ export default function CreateDraft() {
     </table>
   );
 }
+
+interface CreateDraftResponse {
+  message: string;
+  errors: string[];
+}
+
+export async function createDraftQuery(param: CreateDraftParams): Promise<CreateDraftResponse> {
+  try {
+    const token = sessionStorage.getItem("scpm.auth.token");
+    const response = await fetch("http://localhost:8080/api/paysummaries/calculate-monthly", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        employeeCodes: param.employeeCode,
+        month: param.date + "-01"
+      })
+    });
+
+    if (response.ok) {
+      const data: CreateDraftResponse = await response.json();
+      return data;
+    } else {
+      const errorText = await response.text();
+      throw new Error(errorText);
+    }
+  } catch (error) {
+    console.error("Error creating draft:", error);
+    throw error;
+  }
+};
