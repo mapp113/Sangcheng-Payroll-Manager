@@ -32,7 +32,7 @@ public class InsurancePolicyController {
         return insurancePolicyService.updateInsurancePolicy(id,request);
     }
 
-    @DeleteMapping("/{id")
+    @DeleteMapping("/{id}")
     public InsurancePolicyResponse deleteInsurancePolicy(@PathVariable Integer id) {
         insurancePolicyService.deleteInsurancePolicy(id);
         return InsurancePolicyResponse.builder().build();
