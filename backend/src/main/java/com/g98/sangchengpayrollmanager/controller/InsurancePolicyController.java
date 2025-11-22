@@ -5,6 +5,7 @@ import com.g98.sangchengpayrollmanager.model.dto.InsurancePolicyDTO;
 import com.g98.sangchengpayrollmanager.model.dto.insurancepolicy.InsurancePolicyResponse;
 import com.g98.sangchengpayrollmanager.service.InsurancePolicyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,8 +34,8 @@ public class InsurancePolicyController {
     }
 
     @DeleteMapping("/{id}")
-    public InsurancePolicyResponse deleteInsurancePolicy(@PathVariable Integer id) {
+    public ResponseEntity<Object> deleteInsurancePolicy(@PathVariable Integer id) {
         insurancePolicyService.deleteInsurancePolicy(id);
-        return InsurancePolicyResponse.builder().build();
+        return ResponseEntity.noContent().build();
     }
 }
