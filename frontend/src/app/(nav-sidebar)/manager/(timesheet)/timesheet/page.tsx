@@ -7,7 +7,7 @@ import { CreateDraftParams, TimesheetParam, TimesheetRecord } from "@/app/_compo
 import { CreateDraftParamContext, ParamsContext } from "@/app/_components/manager/timesheet/timesheet-context";
 import { DataContext } from "@/app/_components/manager/timesheet/timesheet-context";
 import FormPopBox from "@/app/_components/common/pop-box/form";
-import { User, Users, X } from "lucide-react";
+import { X } from "lucide-react";
 import CreateDraft, { createDraftQuery } from "@/app/_components/manager/timesheet/create-draft";
 import { NotificationProvider, useNotification } from "@/app/_components/common/pop-box/notification/notification-context";
 import BottomRightNotification from "@/app/_components/common/pop-box/notification/bottom-right";
@@ -61,7 +61,7 @@ function TimesheetPageContent() {
         {showFormPopBox && (
           <FormPopBox>
             <div className="flex justify-end mb-2"><X className="cursor-pointer" onClick={() => setShowFormPopBox(false)} /></div>
-            <div className="text-center font-bold text-xl mb-2">Tạo Payroll nháp</div>
+            <div className="text-center font-bold text-xl mb-2">Tạo bảng lương nháp</div>
             {/* <div className="flex flex-row gap-4 border border-black rounded-xl p-1 justify-center">
               <button className="p-2 rounded-xl hover:bg-gray-200 cursor-pointer"><User className="inline"/>Một nhân viên</button>
               <button className="p-2 rounded-xl hover:bg-gray-200 cursor-pointer"><Users className="inline"/>Nhiều nhân viên</button>

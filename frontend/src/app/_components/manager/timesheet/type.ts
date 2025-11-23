@@ -12,6 +12,7 @@ export type TimesheetRecord = {
   daysHours: string;
   otHours: string;
   timeOff: string;
+  usedleave: string;
 };
 
 export type TimesheetParamsContextType = {
