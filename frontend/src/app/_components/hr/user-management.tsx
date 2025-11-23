@@ -45,7 +45,7 @@ type EmployeeProfile = {
     visaExpiry: string;
     contractUrl: string;
     taxCode: string;
-    dependentCount: string;
+    dependentsNo: string;
 };
 
 type EmployeeProfileResponse = {
@@ -63,7 +63,7 @@ type EmployeeProfileResponse = {
     visaExpiry?: string;
     contractUrl?: string;
     taxCode?: string;
-    dependentCount?: string;
+    dependentsNo?: string;
 };
 
 const emptyProfile: EmployeeProfile = {
@@ -81,7 +81,7 @@ const emptyProfile: EmployeeProfile = {
     visaExpiry: "",
     contractUrl: "",
     taxCode: "",
-    dependentCount: "",
+    dependentsNo: "",
 };
 
 function mapProfileResponse(data: EmployeeProfileResponse): EmployeeProfile {
@@ -100,7 +100,7 @@ function mapProfileResponse(data: EmployeeProfileResponse): EmployeeProfile {
         visaExpiry: data.visaExpiry ?? "",
         contractUrl: data.contractUrl ?? "",
         taxCode: data.taxCode ?? "",
-        dependentCount: data.dependentCount ?? "",
+        dependentsNo: data.dependentsNo ?? "",
     };
 }
 
@@ -239,7 +239,7 @@ export default function UserManagement() {
                 contractUrl: selectedProfile.contractUrl || undefined,
                 position: selectedProfile.position || undefined,
                 citizenId: selectedProfile.citizenId || undefined,
-                dependentCount: selectedProfile.dependentCount || undefined,
+                dependentsNo: selectedProfile.dependentsNo || undefined,
             };
 
             const sanitizedPayload = Object.fromEntries(
@@ -383,7 +383,7 @@ export default function UserManagement() {
                                         <td className="whitespace-nowrap px-4 py-3 text-right">
                                             <button
                                                 onClick={() =>
-                                                    router.push(`/users/${user.employeeCode}`)
+                                                    router.push(`/manager/contract/salary-info/${user.employeeCode}`)
                                                 }
                                                 className="p-2 rounded-full hover:bg-slate-100 text-[#4AB4DE]"
                                             >
@@ -537,8 +537,8 @@ export default function UserManagement() {
                                     type="number"
                                     min={0}
                                     className="rounded-lg border border-[#E2E8F0] px-3 py-2"
-                                    value={selectedProfile.dependentCount}
-                                    onChange={handleProfileChange("dependentCount")}
+                                    value={selectedProfile.dependentsNo}
+                                    onChange={handleProfileChange("dependentsNo")}
                                     disabled={profileLoading}
                                 />
                             </label>

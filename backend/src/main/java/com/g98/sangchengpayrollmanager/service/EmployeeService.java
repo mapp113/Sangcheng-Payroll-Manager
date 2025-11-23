@@ -108,6 +108,9 @@ public class EmployeeService {
         if (request.getAddress() != null) {
             info.setAddress(request.getAddress());
         }
+        if (request.getDependentsNo() != null) {
+            info.setDependentsNo(Integer.valueOf(request.getDependentsNo()));
+        }
 
         if (contract != null) {
             if (request.getContractType() != null) {
@@ -138,6 +141,7 @@ public class EmployeeService {
         String status = contract != null ? contract.getStatus() : resolveUserStatus(user.getStatus());
         String contractType = contract != null ? contract.getType() : null;
         String contractUrl = contract != null ? contract.getPdfPath() : null;
+        int dependentsNo = info.getDependentsNo();
 
         return new EmployeeProfileResponse(
                 user.getEmployeeCode(),
@@ -153,7 +157,8 @@ public class EmployeeService {
                 info.getAddress(),
                 visaExpiry,
                 contractUrl,
-                info.getTaxNo()
+                info.getTaxNo(),
+                dependentsNo
         );
     }
 

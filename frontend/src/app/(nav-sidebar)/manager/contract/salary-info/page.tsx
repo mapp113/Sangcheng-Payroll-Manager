@@ -220,7 +220,7 @@ export default function SalaryInfoPage() {
                     </div>
                 </header>
 
-                <section className="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
+                <section className="space-y-6">
                     {/* ==== THÔNG TIN LƯƠNG NHÂN VIÊN – BẢNG 4 CỘT ==== */}
                     <div className="space-y-4">
                         <div className="rounded-3xl bg-white p-6 shadow-sm">

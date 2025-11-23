@@ -1,4 +1,4 @@
-import UserManagement from "../../_components/admin/user-management";
+import UserManagement from "@app/_components/hr/user-management";
 
 export default function ContractPage() {
     return <UserManagement/>;

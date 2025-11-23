@@ -29,7 +29,7 @@ public class HrController {
 
     @GetMapping("/users")
     public ApiResponse<List<UserDTO>> getUsers() {
-        List<UserDTO> users = adminService.getAllUsers();
+        List<UserDTO> users = adminService.getAllEmployees();
         return ApiResponse.<List<UserDTO>>builder()
                 .status(200)
                 .message("Lấy danh sách user thành công")

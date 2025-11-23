@@ -16,6 +16,7 @@ public record EmployeeProfileResponse(
         String address,
         LocalDate visaExpiry,
         String contractUrl,
-        String taxCode
+        String taxCode,
+        Integer dependentsNo
 ) {
 }

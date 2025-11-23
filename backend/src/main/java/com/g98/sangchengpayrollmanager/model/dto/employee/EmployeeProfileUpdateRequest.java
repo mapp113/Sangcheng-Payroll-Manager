@@ -28,4 +28,6 @@ public class EmployeeProfileUpdateRequest {
     private LocalDate visaExpiry;
 
     private String contractUrl;
+
+    private String dependentsNo;
 }
