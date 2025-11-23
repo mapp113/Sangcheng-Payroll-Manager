@@ -22,9 +22,21 @@ export default function TaxLevelComponent() {
   const [submitting, setSubmitting] = useState(false);
   const taxLevelsContext = useContext(TaxLevelListContext);
   const { addNotification } = useNotification();
+  const [userRole, setUserRole] = useState<string>("");
   
   useEffect(() => {
     fetchTaxLevels(taxLevelsContext, setLoading);
+    
+    // Get user role from session storage
+    const userStr = sessionStorage.getItem("scpm.auth.user");
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        setUserRole(user.role || "");
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -130,12 +142,14 @@ export default function TaxLevelComponent() {
     <div className="flex-1 bg-[#e0f7fa] rounded-lg p-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Bậc thuế thu nhập cá nhân</h2>
-        <button 
-          onClick={() => setShowAddForm(true)}
-          className="px-4 py-2 bg-[#81d4fa] rounded-md hover:bg-[#4fc3f7] transition-colors cursor-pointer"
-        >
-          + Thêm mới
-        </button>
+        {userRole !== "EMPLOYEE" && (
+          <button 
+            onClick={() => setShowAddForm(true)}
+            className="px-4 py-2 bg-[#81d4fa] rounded-md hover:bg-[#4fc3f7] transition-colors cursor-pointer"
+          >
+            + Thêm mới
+          </button>
+        )}
       </div>
 
       <div className="bg-white rounded-lg overflow-hidden">
@@ -170,20 +184,22 @@ export default function TaxLevelComponent() {
                   <td className="px-4 py-3">{tax.toValue.toLocaleString()}</td>
                   <td className="px-4 py-3">{tax.percentage}%</td>
                   <td className="px-4 py-3">
-                    <div className="flex gap-2">
-                      <button 
-                        onClick={() => handleEdit(tax)}
-                        className="px-3 py-1 bg-[#81d4fa] rounded hover:bg-[#4fc3f7] transition-colors text-sm cursor-pointer"
-                      >
-                        Edit
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(tax.id, tax.name)}
-                        className="px-2 py-1 text-red-600 hover:bg-red-50 rounded transition-colors cursor-pointer"
-                      >
-                        <Trash />
-                      </button>
-                    </div>
+                    {userRole !== "EMPLOYEE" && (
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => handleEdit(tax)}
+                          className="px-3 py-1 bg-[#81d4fa] rounded hover:bg-[#4fc3f7] transition-colors text-sm cursor-pointer"
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(tax.id, tax.name)}
+                          className="px-2 py-1 text-red-600 hover:bg-red-50 rounded transition-colors cursor-pointer"
+                        >
+                          <Trash />
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))
