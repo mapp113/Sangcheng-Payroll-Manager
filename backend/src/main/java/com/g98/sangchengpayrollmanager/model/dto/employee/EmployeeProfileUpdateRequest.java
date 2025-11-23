@@ -18,6 +18,7 @@ public class EmployeeProfileUpdateRequest {
     private String phone;
     private String taxCode;
     private String status;
+    private String citizenId;
     private String address;
 
     @JsonFormat(pattern = "yyyy-MM-dd")

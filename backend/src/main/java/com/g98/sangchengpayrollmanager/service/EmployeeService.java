@@ -102,6 +102,9 @@ public class EmployeeService {
         if (request.getTaxCode() != null) {
             info.setTaxNo(request.getTaxCode());
         }
+        if (request.getCitizenId() != null) {
+            info.setSocialNo(request.getCitizenId());
+        }
         if (request.getAddress() != null) {
             info.setAddress(request.getAddress());
         }
@@ -110,9 +113,8 @@ public class EmployeeService {
             if (request.getContractType() != null) {
                 contract.setType(request.getContractType());
             }
-            if (request.getStatus() != null) {
-                contract.setStatus(request.getStatus());
-            }
+            updateStatus(user, contract, request.getStatus());
+
             if (request.getJoinDate() != null) {
                 contract.setStartDate(request.getJoinDate());
             }
@@ -122,6 +124,8 @@ public class EmployeeService {
             if (request.getContractUrl() != null) {
                 contract.setPdfPath(request.getContractUrl());
             }
+        } else {
+            updateStatus(user, null, request.getStatus());
         }
     }
 
@@ -154,9 +158,26 @@ public class EmployeeService {
     }
 
     private String resolveUserStatus(Integer status) {
-        if (Objects.equals(status, 1)) return "Hoạt động";
-        if (Objects.equals(status, 0)) return "Tạm khóa";
-        return "Không xác định";
+        if (Objects.equals(status, 1)) return "ACTIVE";
+        if (Objects.equals(status, 0)) return "INACTIVE";
+        return "UNKNOWN";
+    }
+
+    private void updateStatus(User user, Contract contract, String status) {
+        if (status == null) {
+            return;
+        }
+
+        if (contract != null) {
+            contract.setStatus(status);
+            return;
+        }
+
+        if (status.equalsIgnoreCase("ACTIVE")) {
+            user.setStatus(1);
+        } else if (status.equalsIgnoreCase("INACTIVE")) {
+            user.setStatus(0);
+        }
     }
 
     private boolean isEmployee(String role) {
@@ -173,6 +194,7 @@ public class EmployeeService {
                 || request.getDob() != null
                 || request.getContractType() != null
                 || request.getTaxCode() != null
+                || request.getCitizenId() != null
                 || request.getStatus() != null
                 || request.getJoinDate() != null
                 || request.getVisaExpiry() != null

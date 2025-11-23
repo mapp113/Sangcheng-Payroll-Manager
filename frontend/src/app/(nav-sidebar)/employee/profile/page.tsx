@@ -80,16 +80,16 @@ function formatDateDisplay(value: string) {
     return new Intl.DateTimeFormat("vi-VN").format(date);
 }
 
-function formatCurrency(value: string) {
-    if (!value) return "";
-    const numeric = Number(value);
-    if (Number.isNaN(numeric)) return value;
-    return new Intl.NumberFormat("vi-VN", {
-        style: "currency",
-        currency: "VND",
-        maximumFractionDigits: 0,
-    }).format(numeric);
-}
+// function formatCurrency(value: string) {
+//     if (!value) return "";
+//     const numeric = Number(value);
+//     if (Number.isNaN(numeric)) return value;
+//     return new Intl.NumberFormat("vi-VN", {
+//         style: "currency",
+//         currency: "VND",
+//         maximumFractionDigits: 0,
+//     }).format(numeric);
+// }
 
 function mapProfileResponse(data: EmployeeProfileResponse): EmployeeProfile {
     return {
@@ -347,10 +347,17 @@ export default function DetailEmployeePage() {
                             </InfoField>
 
                             <InfoField
-                                label="E-Mail cá nhân"
+                                label="E-Mail"
                                 icon={<Mail className="h-4 w-4 text-[#4AB4DE]"/>}
                             >
                                 {employee.personalEmail || "—"}
+                            </InfoField>
+
+                            <InfoField
+                                label="Thời hạn kết thúc"
+                                icon={<CalendarClock className="h-4 w-4 text-[#4AB4DE]"/>}
+                            >
+                                {formatDateDisplay(employee.visaExpiry) || "—"}
                             </InfoField>
 
                             <InfoField
@@ -403,12 +410,6 @@ export default function DetailEmployeePage() {
                                 {employee.address || "—"}
                             </InfoField>
 
-                            <InfoField
-                                label="Thời hạn kết thúc"
-                                icon={<CalendarClock className="h-4 w-4 text-[#4AB4DE]"/>}
-                            >
-                                {formatDateDisplay(employee.visaExpiry) || "—"}
-                            </InfoField>
 
                             {/* Nút tải hợp đồng */}
                             <InfoField
@@ -451,7 +452,7 @@ export default function DetailEmployeePage() {
                                 disabled={!canEditField("position")}
                             />
                             <EditField
-                                label="E-Mail cá nhân"
+                                label="E-Mail"
                                 value={employee.personalEmail}
                                 onChange={handleChange("personalEmail")}
                                 disabled={!canEditField("personalEmail")}
@@ -508,12 +509,7 @@ export default function DetailEmployeePage() {
                                 type="date"
                                 disabled={!canEditField("joinDate")}
                             />
-                            <EditField
-                                label="Đường dẫn hợp đồng"
-                                value={employee.contractUrl}
-                                onChange={handleChange("contractUrl")}
-                                disabled={!canEditField("contractUrl")}
-                            />
+
 
                         </div>
 
