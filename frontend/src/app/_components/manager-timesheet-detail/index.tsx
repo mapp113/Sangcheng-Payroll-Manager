@@ -132,20 +132,20 @@ export default function ManagerTimesheetDetail({
 
     const summaryMetrics = [
         {
-            label: "Total Hours",
+            label: "Tổng giờ",
             value: attendanceSummary ? (attendanceSummary.daysHours + attendanceSummary.otHours) : (detail.summaryMetrics[0]?.value || 0),
-            unit: "hrs",
+            unit: "giờ",
             iconSrc: "/icons/attendance.png"
         },
         {
-            label: "Work Hours",
+            label: "Giờ làm việc",
             value: attendanceSummary?.daysHours ?? (detail.summaryMetrics[1]?.value || 0),
-            unit: "hrs"
+            unit: "giờ"
         },
         {
-            label: "Overtime Hours",
+            label: "Giờ tăng ca",
             value: attendanceSummary?.otHours ?? (detail.summaryMetrics[2]?.value || 0),
-            unit: "hrs"
+            unit: "giờ"
         }
     ];
 
@@ -245,11 +245,11 @@ function LeaveSummaryCard({
         <div
             className="rounded-2xl border border-dashed border-[#4AB4DE] bg-[#F4FBFF] p-5 text-[#1D3E6A] shadow-[6px_6px_0_#CCE1F0]">
             <div className="text-xs font-semibold uppercase tracking-[0.3em] text-[#1D3E6A]">
-                TIME PERIOD
+                THỜI GIAN
             </div>
 
             <div className="mt-2 flex flex-col">
-                <label className="text-xs font-semibold text-[#56749A] mb-1">Date</label>
+                <label className="text-xs font-semibold text-[#56749A] mb-1">Tháng</label>
                 <input
                     type="month"
                     value={month.slice(0, 7)}
@@ -262,7 +262,7 @@ function LeaveSummaryCard({
                 <div
                     className="inline-flex items-center w-full gap-2 rounded-full border border-black bg-white px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#1D3E6A] shadow-[3px_3px_0_#CCE1F0]"
                 >
-                    Số buổi nghỉ đã sử dụng
+                    số ngày nghỉ phép năm đã sử dụng
                     <span className="ml-auto rounded-full bg-[#4AB4DE] px-2 py-0.5 text-xs font-semibold text-white">
                         {attendanceSummary?.usedleave ?? leaveSummary.takenDays}
                     </span>
@@ -325,7 +325,7 @@ function TimesheetTable({
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(year, monthNum - 1, day);
             const dateStr = `${year}-${String(monthNum).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const dayNames = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
             const dayName = dayNames[date.getDay()];
             
             // Tìm dữ liệu từ API cho ngày này
@@ -395,11 +395,11 @@ function TimesheetTable({
                 <table className="w-full border-collapse">
                     <thead className="bg-[#CCE1F0] text-xs font-semibold uppercase tracking-[0.3em] text-[#1D3E6A] sticky top-0 z-10">
                         <tr>
-                            <th className="px-5 py-3 text-left">Day</th>
-                            <th className="px-5 py-3 text-left">Checkin</th>
-                            <th className="px-5 py-3 text-left">Checkout</th>
-                            <th className="px-5 py-3 text-left">Work Hours</th>
-                            <th className="px-5 py-3 text-left">Overtime</th>
+                            <th className="px-5 py-3 text-left">Ngày</th>
+                            <th className="px-5 py-3 text-left">Giờ vào</th>
+                            <th className="px-5 py-3 text-left">Giờ ra</th>
+                            <th className="px-5 py-3 text-left">Giờ làm việc</th>
+                            <th className="px-5 py-3 text-left">Tăng ca</th>
                             <th className="px-5 py-3 text-left"></th>
                         </tr>
                     </thead>
@@ -435,7 +435,7 @@ function OtherPeriodCard({
         <div
             className="rounded-2xl border border-dashed border-[#4AB4DE] bg-[#F4FBFF] p-5 text-[#1D3E6A] shadow-[6px_6px_0_#CCE1F0]">
             <div className="text-xs font-semibold uppercase tracking-[0.35em] text-[#56749A]">
-                Time period
+                Khoảng thời gian
             </div>
             <div className="mt-2 flex items-center gap-2">
                 <input
@@ -465,10 +465,10 @@ function OtherEntriesTable({ entries }: { entries?: TimesheetOtherEntry[] }) {
             <table className="w-full border-collapse">
                 <thead className="bg-[#CCE1F0] text-xs font-semibold uppercase tracking-[0.3em] text-[#1D3E6A]">
                     <tr>
-                        <th className="px-5 py-3 text-left">Type</th>
-                        <th className="px-5 py-3 text-left">Description</th>
-                        <th className="px-5 py-3 text-left">Amount</th>
-                        <th className="px-5 py-3 text-left">Started On</th>
+                        <th className="px-5 py-3 text-left">Loại</th>
+                        <th className="px-5 py-3 text-left">Mô tả</th>
+                        <th className="px-5 py-3 text-left">Số tiền</th>
+                        <th className="px-5 py-3 text-left">Ngày bắt đầu</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -509,10 +509,10 @@ function TimesheetTableRow({
 
     return (
         <tr className="border-b border-[#E6F2FB] bg-white last:border-0">
-            <td className="px-5 py-4 align-top">
+            <td className="px-5 py-4 align-center">
                 <div className="text-sm font-semibold text-[#1D3E6A]">
                     {entry.day}
-                    <span className="ml-2 text-xs font-normal text-[#56749A]">{entry.date}</span>
+                    <div className="text-xs font-normal text-[#56749A]">{entry.date}</div>
                 </div>
             </td>
             <td className="px-5 py-4 text-sm font-semibold text-[#1D3E6A]">
@@ -541,7 +541,7 @@ function TimesheetTableRow({
                         onClick={handleDetailClick}
                         className="inline-flex items-center justify-center rounded-full border border-[#4AB4DE] bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#1D3E6A] transition hover:bg-[#E6F7FF] cursor-pointer"
                     >
-                        Detail
+                        Chi tiết
                     </button>
                 )}
             </td>
@@ -614,14 +614,14 @@ function AttendanceDayDetailPopup({
             <div className="space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between pb-4 border-b border-[#CCE1F0]">
-                    <h2 className="text-xl md:text-2xl font-bold text-[#1D3E6A]">Attendance Detail</h2>
+                    <h2 className="text-xl md:text-2xl font-bold text-[#1D3E6A]">Chi tiết chấm công</h2>
                     <div className="flex items-center gap-2">
                         {!isEditing && (
                             <button
                                 onClick={() => setIsEditing(true)}
                                 className="rounded-full border border-[#4AB4DE] bg-white px-3 md:px-4 py-2 text-xs md:text-sm font-semibold uppercase tracking-[0.2em] text-[#1D3E6A] transition hover:bg-[#E6F7FF] cursor-pointer"
                             >
-                                Edit
+                                Chỉnh sửa
                             </button>
                         )}
                         <button
@@ -642,56 +642,56 @@ function AttendanceDayDetailPopup({
                         {/* Employee Info */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-[#F4FBFF] rounded-xl border border-[#CCE1F0]">
                             <div>
-                                <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Employee Code</label>
+                                <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Mã nhân viên</label>
                                 <p className="text-sm font-bold text-[#1D3E6A] mt-1">{employeeInfo?.employeeCode || "--"}</p>
                             </div>
                             <div>
-                                <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Employee Name</label>
+                                <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Tên nhân viên</label>
                                 <p className="text-sm font-bold text-[#1D3E6A] mt-1">{employeeInfo?.fullName || "--"}</p>
                             </div>
                             <div>
-                                <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Position</label>
+                                <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Vị trí</label>
                                 <p className="text-sm font-bold text-[#1D3E6A] mt-1">{employeeInfo?.positionName || "--"}</p>
                             </div>
                             <div>
-                                <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Date</label>
+                                <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Ngày</label>
                                 <p className="text-sm font-bold text-[#1D3E6A] mt-1">{attendanceData.date}</p>
                             </div>
                         </div>
 
                         {/* Attendance Data */}
                         <div className="space-y-4">
-                            <h3 className="text-base md:text-lg font-bold text-[#1D3E6A]">Attendance Information</h3>
+                            <h3 className="text-base md:text-lg font-bold text-[#1D3E6A]">Thông tin chấm công</h3>
                             
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-1">
-                                    <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Day Type</label>
+                                    <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Loại ngày</label>
                                     <p className="text-sm font-bold text-[#1D3E6A]">{attendanceData.dayTypeName}</p>
                                 </div>
                                 
                                 <div className="space-y-1">
-                                    <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Leave Type</label>
+                                    <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Loại nghỉ phép</label>
                                     <p className="text-sm font-bold text-[#1D3E6A]">{attendanceData.leaveTypeCode || "--"}</p>
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Check In Time</label>
+                                    <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Giờ vào</label>
                                     <p className="text-sm font-bold text-[#1D3E6A]">{formatDateTime(attendanceData.checkInTime)}</p>
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Check Out Time</label>
+                                    <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Giờ ra</label>
                                     <p className="text-sm font-bold text-[#1D3E6A]">{formatDateTime(attendanceData.checkOutTime)}</p>
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Work Hours</label>
-                                    <p className="text-sm font-bold text-[#1D3E6A]">{attendanceData.workHours} hrs</p>
+                                    <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Giờ làm việc</label>
+                                    <p className="text-sm font-bold text-[#1D3E6A]">{attendanceData.workHours} giờ</p>
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Overtime Hours</label>
-                                    <p className="text-sm font-bold text-[#1D3E6A]">{attendanceData.otHour} hrs</p>
+                                    <label className="text-xs font-semibold text-[#56749A] uppercase tracking-wider">Giờ tăng ca</label>
+                                    <p className="text-sm font-bold text-[#1D3E6A]">{attendanceData.otHour} giờ</p>
                                 </div>
                             </div>
                         </div>
@@ -699,7 +699,7 @@ function AttendanceDayDetailPopup({
 
                     {/* Right Column - Boolean Flags */}
                     <div className="space-y-4">
-                        <h3 className="text-base md:text-lg font-bold text-[#1D3E6A]">Status Flags</h3>
+                        <h3 className="text-base md:text-lg font-bold text-[#1D3E6A]">Trạng thái</h3>
                         
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="flex items-center gap-2">
@@ -710,7 +710,7 @@ function AttendanceDayDetailPopup({
                                     onChange={(e) => setIsLateCounted(e.target.checked)}
                                     className="w-5 h-5 rounded border-[#CCE1F0] text-[#4AB4DE] focus:ring-[#4AB4DE] cursor-pointer disabled:cursor-not-allowed"
                                 />
-                                <label className="text-sm font-semibold text-[#1D3E6A]">Late Counted</label>
+                                <label className="text-sm font-semibold text-[#1D3E6A]">Tính đi muộn</label>
                             </div>
 
                             <div className="flex items-center gap-2">
@@ -721,7 +721,7 @@ function AttendanceDayDetailPopup({
                                     onChange={(e) => setIsEarlyLeaveCounted(e.target.checked)}
                                     className="w-5 h-5 rounded border-[#CCE1F0] text-[#4AB4DE] focus:ring-[#4AB4DE] cursor-pointer disabled:cursor-not-allowed"
                                 />
-                                <label className="text-sm font-semibold text-[#1D3E6A]">Early Leave Counted</label>
+                                <label className="text-sm font-semibold text-[#1D3E6A]">Tính về sớm</label>
                             </div>
 
                             <div className="flex items-center gap-2">
@@ -731,7 +731,7 @@ function AttendanceDayDetailPopup({
                                     disabled
                                     className="w-5 h-5 rounded border-[#CCE1F0] text-[#4AB4DE] focus:ring-[#4AB4DE] cursor-pointer disabled:cursor-not-allowed"
                                 />
-                                <label className="text-sm font-semibold text-[#1D3E6A]">Count Payable Day</label>
+                                <label className="text-sm font-semibold text-[#1D3E6A]">Tính ngày công</label>
                             </div>
 
                             <div className="flex items-center gap-2">
@@ -741,7 +741,7 @@ function AttendanceDayDetailPopup({
                                     disabled
                                     className="w-5 h-5 rounded border-[#CCE1F0] text-[#4AB4DE] focus:ring-[#4AB4DE]cursor-pointer disabled:cursor-not-allowed"
                                 />
-                                <label className="text-sm font-semibold text-[#1D3E6A]">Absent</label>
+                                <label className="text-sm font-semibold text-[#1D3E6A]">Vắng mặt</label>
                             </div>
 
                             <div className="flex items-center gap-2">
@@ -752,7 +752,7 @@ function AttendanceDayDetailPopup({
                                     onChange={(e) => setIsDayMeal(e.target.checked)}
                                     className="w-5 h-5 rounded border-[#CCE1F0] text-[#4AB4DE] focus:ring-[#4AB4DE] cursor-pointer disabled:cursor-not-allowed"
                                 />
-                                <label className="text-sm font-semibold text-[#1D3E6A]">Day Meal</label>
+                                <label className="text-sm font-semibold text-[#1D3E6A]">Tính cơm</label>
                             </div>
 
                             <div className="flex items-center gap-2">
@@ -762,7 +762,7 @@ function AttendanceDayDetailPopup({
                                     disabled
                                     className="w-5 h-5 rounded border-[#CCE1F0] text-[#4AB4DE] focus:ring-[#4AB4DE] cursor-pointer disabled:cursor-not-allowed"
                                 />
-                                <label className="text-sm font-semibold text-[#1D3E6A]">Trial Day</label>
+                                <label className="text-sm font-semibold text-[#1D3E6A]">Ngày thử việc</label>
                             </div>
                         </div>
                     </div>
@@ -782,14 +782,14 @@ function AttendanceDayDetailPopup({
                                 className="rounded-full border border-[#56749A] bg-white px-6 py-2 text-xs md:text-sm font-semibold uppercase tracking-[0.3em] text-[#56749A] transition hover:bg-gray-50 cursor-pointer"
                                 disabled={isSaving}
                             >
-                                Cancel
+                                Hủy
                             </button>
                             <button
                                 onClick={handleSave}
                                 disabled={isSaving}
                                 className="rounded-full border border-[#4AB4DE] bg-[#4AB4DE] px-6 py-2 text-xs md:text-sm font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-[#3A9AC0] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {isSaving ? 'Saving...' : 'Save'}
+                                {isSaving ? 'Đang lưu...' : 'Lưu'}
                             </button>
                         </>
                     )}
@@ -798,7 +798,7 @@ function AttendanceDayDetailPopup({
                             onClick={onClose}
                             className="rounded-full border border-[#4AB4DE] bg-white px-6 py-2 text-xs md:text-sm font-semibold uppercase tracking-[0.3em] text-[#1D3E6A] transition hover:bg-[#E6F7FF] cursor-pointer"
                         >
-                            Close
+                            Đóng
                         </button>
                     )}
                 </div>
